@@ -1,0 +1,7 @@
+['remote "s3remote"']
+url = s3://ki-dori/gbi-genios_event_detection
+endpointurl = https://minio.infra.wogra.com
+credentialpath = .minio_credentials
+
+[core]
+remote = s3remote

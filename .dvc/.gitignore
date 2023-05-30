@@ -1,0 +1,4 @@
+.minio_credentials
+/config.local
+/tmp
+/cache
