@@ -1,45 +1,39 @@
 stages:
-  - build
   - learn
 
-variables:
-  DOCKER_TLS_CERTDIR: "/certs"
+# variables:
+#   DOCKER_TLS_CERTDIR: "/certs"
+# 
+# .build_template:
+#   stage: build
+#   services:
+#     - name: docker:dind
+#       command: [ "--tls=false" ]
+#   tags:
+#     - aime
+#   variables:
+#     DOCKER_DRIVER: overlay2
+#     DOCKER_BUILDKIT: 1
+#     DOCKER_TLS_CERTDIR: ""
 
-.build_template:
-  stage: build
-  services:
-    - name: docker:dind
-      command: [ "--tls=false" ]
-  tags:
-    - aime
-  variables:
-    DOCKER_DRIVER: overlay2
-    DOCKER_BUILDKIT: 1
-    DOCKER_TLS_CERTDIR: ""
-
-build-dvc-interpreter:
-  stage: build
-  extends: .build_template
-  variables:
-    IMAGE_NAME: dvc-interprete
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - docker build -t $CI_REGISTRY_IMAGE/$IMAGE_NAME:$CI_COMMIT_SHA .
-    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME:$CI_COMMIT_SHA
-  after_script:
-    - docker rmi $CI_REGISTRY_IMAGE/$IMAGE_NAME:$CI_COMMIT_SHA
+#build-dvc-interpreter:
+#  stage: build
+#  extends: .build_template
+#  variables:
+#    IMAGE_NAME: dvc-interprete
+#  before_script:
+#    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#  script:
+#    - docker build -t $CI_REGISTRY_IMAGE/$IMAGE_NAME:$CI_COMMIT_SHA .
+#    - docker push $CI_REGISTRY_IMAGE/$IMAGE_NAME:$CI_COMMIT_SHA
+#  after_script:
+#    - docker rmi $CI_REGISTRY_IMAGE/$IMAGE_NAME:$CI_COMMIT_SHA
 
 dvc-repro-and-push:
+  image: ludwigai/ludwig-ray-gpu:0.7.4
   stage: learn
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - docker run --gpus all --rm
-        -e DVC_S3_AWS_ACCESS_KEY_ID=$DVC_S3_AWS_ACCESS_KEY_ID
-        -e DVC_S3_AWS_SECRET_ACCESS_KEY=$DVC_S3_AWS_SECRET_ACCESS_KEY
-        -e CML_TOKEN=$CML_TOKEN
-        -e CI_SERVER_HOST=$CI_SERVER_HOST
-        -e CI_PROJECT_PATH=$CI_PROJECT_PATH
-        -e CI_COMMIT_REF_NAME=$CI_COMMIT_REF_NAME
-        $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA
+    - pip install -r requirements.txt
+    - bash create_minio_credentials.sh
+    - bash cml-dvc-repro.sh
+
