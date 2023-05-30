@@ -3,13 +3,13 @@ import boto3
 from datasets import load_dataset
 
 def download_data(
-           endpoint: str,
+           endpoint_url: str,
            bucket: str,
            path: str,
            credential_path: str = '.dvc/.minio_credentials'):
     os.environ['AWS_SHARED_CREDENTIALS_FILE'] = credential_path
 
-    s3 = boto3.resource("s3", endpoint=endpoint)
+    s3 = boto3.resource("s3", endpoint_url=endpoint_url)
     bucket = s3.Bucket(bucket_name)
     bucket.download_file(path, "data.zip")
     return "data"
