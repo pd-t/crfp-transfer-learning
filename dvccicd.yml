@@ -3,23 +3,8 @@ image: docker:20.10.14
 services:
   - docker:20.10.14-dind
 
-include:
-  - project: infrastructure/kubernetes-flux
-    ref: main
-    file: .gitlab/include/CommitToBranch.gitlab-ci.yaml
-
 before_script:
   - docker info
-
-.enable-vault-ssh: &remote-access
-  - apk update && apk --no-cache add openssh-client vault curl
-  - eval $(ssh-agent -s)
-  - mkdir -p ~/.ssh
-  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\nHost *.infra.wogra.com\n\tUser wogra\n" > ~/.ssh/config'
-  - curl -LS https://gitlab.com/gopenguin/vault-ssh-agent-helper/-/jobs/artifacts/master/raw/dist/vault-ssh-agent-helper_linux_amd64/vault-ssh-agent-helper?job=compile -o /usr/local/bin/vault-ssh-agent-helper && chmod a+x /usr/local/bin/vault-ssh-agent-helper
-  - export VAULT_ADDR=$VAULT_ADDRESS
-  - export VAULT_TOKEN="$(vault write -field=token auth/jwt-gitlab/login role=$VAULT_ROLE jwt=$CI_JOB_JWT)"
-  - vault-ssh-agent-helper
 
 stages:
   - build
