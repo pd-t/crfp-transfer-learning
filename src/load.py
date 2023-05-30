@@ -18,7 +18,8 @@ def download_data_from_s3(
             's3',
             endpoint_url=endpoint_url
             )
-    client.download_fileobj(bucket, path, local_path)
+    with open(local_path, 'wb') as f:
+        client.download_fileobj(bucket, path, f)
 
 def unzip(source_file: str,
           target_path: str):
