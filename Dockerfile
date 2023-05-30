@@ -1,8 +1,4 @@
 FROM ludwigai/ludwig-ray-gpu:0.7.4
-RUN apt-get update \
-&& apt-get install -y --no-install-recommends git \
-&& apt-get purge -y --auto-remove \
-&& rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY . .
