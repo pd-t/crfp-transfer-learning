@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 git config --local user.email "cml@gitlab.wogra.com"
 git config --local user.name "Gitlab CML"
@@ -28,3 +28,4 @@ if git commit -m '[CML] Add new dvc.lock'
   else
     echo '[CML] dvc is up-to-date, ready for release!'
 fi
+
