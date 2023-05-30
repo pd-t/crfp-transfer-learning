@@ -54,12 +54,12 @@ def load(
 if __name__ == '__main__':
     Path('data/load.dir').mkdir(parents=True, exist_ok=True)
     Path('data/tmp.dir').mkdir(parents=True, exist_ok=True)
-
-endpoint_url = "https://storage.s3.mlops.wogra.com"
-bucket_name = "data"
-file_name = "dlr/Tapelegedaten2023.zip"
-
-loaded_dataset = load(endpoint_url, bucket_name, file_name)
-
-loaded_dataset.save_to_disk('data/load.dir/dataset')
+    
+    endpoint_url = "https://storage.s3.mlops.wogra.com"
+    bucket_name = "data"
+    file_name = "dlr/Tapelegedaten2023.zip"
+    
+    loaded_dataset = load(endpoint_url, bucket_name, file_name)
+    
+    loaded_dataset.save_to_disk('data/load.dir/dataset')
 
