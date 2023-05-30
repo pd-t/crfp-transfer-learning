@@ -32,6 +32,8 @@ stages:
 dvc-repro-and-push:
   image: ludwigai/ludwig-ray-gpu:0.7.4
   stage: learn
+  tags:
+    - aime
   script:
     - pip install -r requirements.txt
     - bash create_minio_credentials.sh
