@@ -1,0 +1,55 @@
+stages:
+  - build
+  - setup
+
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+
+.build_template:
+  stage: build
+  services:
+    - name: docker:dind
+      command: [ "--tls=false" ]
+  tags:
+    - aime
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_BUILDKIT: 1
+    DOCKER_TLS_CERTDIR: ""
+
+.ssh_template:
+  image: docker:20.10.14
+  services:
+    - docker:20.10.14-dind
+  tags:
+    - aime
+  before_script:
+    - 'which ssh-agent || ( apk add openssh-client )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_KEY" | ssh-add -
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+
+build-jupyterhub:
+  extends: .build_template
+  script:
+    - docker build --build-arg JUPYTERHUB_VERSION=3.1.1
+      -t $CI_REGISTRY_IMAGE/jupyterhub:$CI_COMMIT_SHA .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE/jupyterhub:$CI_COMMIT_SHA
+
+
+setup-jupyter:
+  extends: .ssh_template
+  stage: setup
+  script:
+    - ssh aime@aime.infra.wogra.com "docker pull wogra/ludwig-ray-gpu-jupyterhub:ludwig0.7.4-jupyterhub3.1.1"
+    - ssh aime@aime.infra.wogra.com "docker pull jupyter/minimal-notebook"
+    - echo CI_REGISTRY_IMAGE=$CI_REGISTRY_IMAGE >> .env;
+    - echo CI_COMMIT_SHA=$CI_COMMIT_SHA >> .env;
+    - ssh aime@aime.infra.wogra.com "docker login -u gitlab -p $REGISTRY_DEPLOY_TOKEN $CI_REGISTRY
+      && docker pull $CI_REGISTRY_IMAGE/jupyterhub:$CI_COMMIT_SHA"
+    - ssh aime@aime.infra.wogra.com "sudo mkdir -p /srv/jupyterhub; sudo chown aime /srv/jupyterhub"
+    - scp -r .env setup.sh docker-compose.yml secrets aime@aime.infra.wogra.com:/srv/jupyterhub
+    - ssh aime@aime.infra.wogra.com "cd /srv/jupyterhub; bash setup.sh"

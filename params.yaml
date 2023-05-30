@@ -1,0 +1,19 @@
+data:
+  remote:
+    s3_profile: 's3raw'
+    s3_endpoint: 'https://minio.infra.wogra.com'
+    s3_bucket: 'ki-methusalem'
+    s3_path: '2021/Scanup/Scan_V4/OMT/2021-05-18-export/omt.zip'
+
+  culture_id: 1
+  test_train_ratio: 0.33
+  random_state: 42
+
+model:
+  word_sequence_length_limit: 256
+  epochs: 10
+  early_stop: 3
+  batch_size: 4
+  learning_rate: 0.00002
+  filter_tokenizer_words: 5000
+  filter_token_length: 2

@@ -1,0 +1,172 @@
+image: docker:20.10.14
+
+services:
+  - docker:20.10.14-dind
+
+include:
+  - project: infrastructure/kubernetes-flux
+    ref: main
+    file: .gitlab/include/CommitToBranch.gitlab-ci.yaml
+
+before_script:
+  - docker info
+
+.enable-vault-ssh: &remote-access
+  - apk update && apk --no-cache add openssh-client vault curl
+  - eval $(ssh-agent -s)
+  - mkdir -p ~/.ssh
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\nHost *.infra.wogra.com\n\tUser wogra\n" > ~/.ssh/config'
+  - curl -LS https://gitlab.com/gopenguin/vault-ssh-agent-helper/-/jobs/artifacts/master/raw/dist/vault-ssh-agent-helper_linux_amd64/vault-ssh-agent-helper?job=compile -o /usr/local/bin/vault-ssh-agent-helper && chmod a+x /usr/local/bin/vault-ssh-agent-helper
+  - export VAULT_ADDR=$VAULT_ADDRESS
+  - export VAULT_TOKEN="$(vault write -field=token auth/jwt-gitlab/login role=$VAULT_ROLE jwt=$CI_JOB_JWT)"
+  - vault-ssh-agent-helper
+
+stages:
+  - build
+  - test
+  - train
+  - evaluate
+  - release
+  - deploy
+  - cleanup
+
+python-environment-cpu:
+  stage: build
+  variables:
+    TARGET: python-environment
+  script:
+    - DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build
+        --target $TARGET -t $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA .
+    - docker rmi $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA
+
+#python-environment-gpu:
+#  stage: build
+#  only:
+#    variables:
+#      - $ENABLE_GPU == "True"
+#  variables:
+#    TARGET: python-environment
+#  script:
+#    - DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build -f gpu.Dockerfile
+#        --target $TARGET -t $CI_REGISTRY_IMAGE/$TARGET-gpu:$CI_COMMIT_SHORT_SHA .
+#    - docker rmi $CI_REGISTRY_IMAGE/$TARGET-gpu:$CI_COMMIT_SHORT_SHA
+
+flake8:
+  stage: test
+  variables:
+    TARGET: flake8
+  script:
+    - DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build
+        --target $TARGET -t $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA .
+    - docker rmi $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA
+
+pytest:
+  stage: test
+  variables:
+    TARGET: pytest
+  script:
+    - DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build
+        --target $TARGET -t $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA .
+    - docker rmi $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA
+
+cml-dvc-repro:
+  stage: train
+  variables:
+    TARGET: cml-dvc-repro
+  before_script:
+    - /bin/sh create_minio_credentials.sh
+  script:
+    - if [ "$ENABLE_GPU" = True ]; then GPU_BUILD_FLAG="-f gpu.Dockerfile"; fi
+    - DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build $GPU_BUILD_FLAG
+        --target $TARGET
+        -t $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA .
+    - if [ "$ENABLE_GPU" = True ]; then GPU_RUN_FLAG="--gpus all"; fi
+    - docker run $GPU_RUN_FLAG --rm
+        -e CML_TOKEN=$CML_TOKEN
+        -e CI_SERVER_HOST=$CI_SERVER_HOST
+        -e CI_PROJECT_PATH=$CI_PROJECT_PATH
+        -e CI_COMMIT_REF_NAME=$CI_COMMIT_REF_NAME
+        $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA
+  after_script:
+    - docker rmi $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA
+
+cml-comment:
+  stage: evaluate
+  except:
+    refs:
+      - master
+  image: dvcorg/cml-py3:latest
+  variables:
+    GIT_SSL_NO_VERIFY: 1
+    repo_token: $CML_TOKEN
+  before_script:
+    - /bin/sh create_minio_credentials.sh
+  script:
+    - git fetch
+    - git checkout $(git rev-list -1 origin/master dvc.lock)
+    - dvc pull data/evaluate.dir/
+    - echo "## Master " $(git rev-parse --short HEAD) >> cml-comment.md
+    - '[[ -d data/evaluate.dir ]] && for image in data/evaluate.dir/*.png; do cml-publish $image --md >> cml-comment.md; done'
+    - echo "## Current GIT_SHA " $(git rev-parse --short HEAD) " and CI_SHA " $CI_COMMIT_SHORT_SHA >> cml-comment.md
+    - DVC_LOCK_SHA=$(git rev-list -1 origin/$CI_COMMIT_REF_NAME dvc.lock)
+    - echo "# dvc.lock last changed " $DVC_LOCK_SHA
+    - git checkout $DVC_LOCK_SHA
+    - dvc pull data/evaluate.dir/
+    - '[[ -d data/evaluate.dir ]] && for image in data/evaluate.dir/*.png; do cml-publish $image --md >> cml-comment.md; done'
+    - cml-send-comment cml-comment.md
+
+cml-report:
+  stage: evaluate
+  only:
+    refs:
+      - master
+  image: dvcorg/cml-py3:latest
+  variables:
+    GIT_SSL_NO_VERIFY: 1
+    repo_token: $CML_TOKEN
+  before_script:
+    - /bin/sh create_minio_credentials.sh
+  script:
+    - git config --local user.email "cml@gitlab.wogra.com"
+    - git config --local user.name "Gitlab CML"
+    - dvc pull data/evaluate.dir/
+    - echo "## CML Report " $(git rev-list -1 origin/master dvc.lock) > cml-report.md
+    - '[[ -d data/evaluate.dir ]] && for image in data/evaluate.dir/*.png; do cml-publish $image --md >> cml-report.md; done'
+    - git add cml-report.md || true
+    - git commit -m '[skip ci] update cml-report.md' || true
+    - git push https://CML_TOKEN:$CML_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:$CI_COMMIT_REF_NAME || true
+
+release-app:
+  stage: release
+  when: manual
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - /bin/sh create_minio_credentials.sh
+  variables:
+    PYENV: pyenv-production
+    TARGET: app
+  script:
+    - DOCKER_BUILDKIT=1 BUILDKIT_PROGRESS=plain docker build
+        --target $TARGET -t $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA .
+    - docker push $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA
+    - docker rmi $CI_REGISTRY_IMAGE/$TARGET:$CI_COMMIT_SHORT_SHA
+
+deploy-prod:
+  stage: deploy
+  environment:
+    name: prod
+    url: https://scan-omt-app-prod.main-kubernetes.wogra.com
+  extends:
+    - .commit-to-branch
+  needs:
+    - release-app
+  allow_failure: true
+  script:
+    - rm -rf $CI_ENVIRONMENT_SLUG
+    - echo $CI_ENVIRONMENT_SLUG
+    - ls ../deploy
+    - sed -i "s/CI_COMMIT_SHORT_SHA/$CI_COMMIT_SHORT_SHA/g" ../deploy/base/app-deployment.yaml
+    - sed -i "s/ENVIRONMENT/$CI_ENVIRONMENT_SLUG/g" ../deploy/kustomization.yaml
+    - cp -R ../deploy $CI_ENVIRONMENT_SLUG
+    - git add $CI_ENVIRONMENT_SLUG 
+

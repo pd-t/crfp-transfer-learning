@@ -1,0 +1,33 @@
+stages:
+  load:
+    cmd: PYTHONPATH="." python src/load.py
+    params:
+      - data.remote.s3_profile
+      - data.remote.s3_endpoint_url
+      - data.remote.s3_bucket_name
+      - data.remote.s3_file_name
+    deps:
+      - src/load.py
+    outs:
+      - data/load.dir
+  prepare:
+    cmd: PYTHONPATH="." python src/prepare.py
+    deps:
+      - data/load.dir
+      - src/prepare.py
+    outs:
+      - data/prepare.dir
+  train:
+    cmd: PYTHONPATH="." python src/train.py
+    deps:
+      - data/prepare.dir
+      - src/train.py
+    outs:
+      - data/train.dir
+  evaluate:
+    cmd: PYTHONPATH="." python src/evaluate.py
+    deps:
+      - data/train.dir
+      - src/evaluate.py
+    outs:
+      - data/evaluate.dir
