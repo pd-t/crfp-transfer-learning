@@ -9,7 +9,7 @@ def download_data_from_s3(
            endpoint_url: str,
            bucket: str,
            path: str,
-           local_path: str = 'data/data.zip',
+           local_path: str,
            credential_path: str = '.dvc/.minio_credentials'):
     os.environ['AWS_SHARED_CREDENTIALS_FILE'] = credential_path
 
@@ -30,7 +30,7 @@ def load(
     s3_endpoint_url: str,
     s3_bucket: str,
     s3_path: str,
-    local_path: str
+    local_path: str = 'data/data.zip'
 ) -> datasets.Dataset:
 
     print('load: download data')
@@ -51,7 +51,6 @@ def load(
     dataset = load_dataset("imagefolder", data_dir='data/tmp.dir', split="train")
     return dataset
 
-
 if __name__ == '__main__':
     Path('data/load.dir').mkdir(parents=True, exist_ok=True)
     Path('data/tmp.dir').mkdir(parents=True, exist_ok=True)
@@ -59,5 +58,8 @@ if __name__ == '__main__':
 endpoint_url = "https://storage.s3.mlops.wogra.com"
 bucket_name = "data"
 file_name = "dlr/Tapelegedaten2023.zip"
-data_directory = download_data_from_s3(endpoint_url, bucket_name, file_name)
+
+loaded_dataset = load(endpoint_url, bucket_name, file_name)
+
+loaded_dataset.save_to_disk('data/load.dir/dataset')
 
