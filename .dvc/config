@@ -1,6 +1,6 @@
 ['remote "s3remote"']
-url = s3://ki-dori/gbi-genios_event_detection
-endpointurl = https://minio.infra.wogra.com
+url = s3://dvc/dlr
+endpointurl = https://storage.s3.mlops.wogra.com
 credentialpath = .minio_credentials
 
 [core]
