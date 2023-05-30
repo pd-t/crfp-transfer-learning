@@ -10,7 +10,7 @@ def download_data(
     os.environ['AWS_SHARED_CREDENTIALS_FILE'] = credential_path
 
     s3 = boto3.resource("s3", endpoint_url=endpoint_url)
-    bucket = s3.Bucket(bucket_name)
+    bucket = s3.Bucket(bucket)
     bucket.download_file(path, "data.zip")
     return "data"
 
