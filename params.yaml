@@ -1,6 +1,5 @@
 data:
   remote:
-    s3_profile: 's3data'
     s3_endpoint: 'https://storage.s3.mlops.wogra.com'
     s3_bucket: 'data'
     s3_path: 'dlr/my_best_tapelegen_model.zip'
