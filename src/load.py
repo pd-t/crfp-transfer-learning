@@ -1,3 +1,4 @@
+import os
 import boto3
 from datasets import load_dataset
 
