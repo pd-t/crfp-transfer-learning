@@ -9,7 +9,7 @@ def download_data(
            credential_path: str = '.dvc/.minio_credentials'):
     os.environ['AWS_SHARED_CREDENTIALS_FILE'] = credential_path
 
-    s3 = boto3.resource("s3", endpoint_url=endpoint_url)
+    s3 = boto3.resource("s3", endpoint=endpoint)
     bucket = s3.Bucket(bucket_name)
     bucket.download_file(path, "data.zip")
     return "data"
