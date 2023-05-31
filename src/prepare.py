@@ -2,39 +2,10 @@ import numpy as np
 from datasets import concatenate_datasets, Dataset, load_from_disk
 from pathlib import Path
 
-
-def preprocess(image):
-    # convert image to tensor
-    tensor = transforms.ToTensor()(image)
-    tensor = tensor - np.mean(tensor.numpy()) + 128
-    tensor[tensor < 0] = 0
-    tensor[tensor > 255] = 255
-    tensor = tensor / 255
-    # repeat the tensor two ore times to get 3 channels and use the repeat function
-    tensor = tensor.repeat(3, 1, 1)
-    return tensor
-
-
-class Preprocess:
-    def __init__(self):
-        self.transforms = transforms.Compose(
-            [
-                transforms.Lambda(preprocess),
-                transforms.CenterCrop(224),
-            ]
-        )
-
-    def __call__(self, example_batch):
-        example_batch["pixel_values"] = [
-            self.transforms(img) for img in example_batch["image"]
-        ]
-        del example_batch["image"]
-        return example_batch
-
 def prepare(dataset: Dataset) -> Dataset:
     dataset = dataset.filter(lambda example: np.mean(example["image"]) != 0)
     
-    dataset = dataset.with_transform(Preprocess())
+
 
     labels = dataset.features["label"].names
     label2id, id2label = dict(), dict()
@@ -60,10 +31,7 @@ def prepare(dataset: Dataset) -> Dataset:
 
 if __name__ == '__main__':
     Path('data/prepare.dir').mkdir(parents=True, exist_ok=True)
-
     loaded_dataset = load_from_disk("data/load.dir/dataset")
-    
     prepared_dataset = prepare(loaded_dataset)
-
     prepared_dataset.save_to_disk('data/prepare.dir/dataset')
 

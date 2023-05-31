@@ -16,3 +16,33 @@ stages:
       md5: af8331560f6eff828e8a443f0b0a2d3f.dir
       size: 26497564
       nfiles: 3
+  prepare:
+    cmd: PYTHONPATH="." python src/prepare.py
+    deps:
+    - path: data/load.dir
+      md5: ab7ebaf0960708e590cf5a389ec08b0b.dir
+      size: 26524244
+      nfiles: 10
+    - path: src/prepare.py
+      md5: 2bbf51ab757b198c8e2bf64b9210d885
+      size: 1164
+    outs:
+    - path: data/prepare.dir
+      md5: 4a969f56558203e8e03c5f85546b7d5f.dir
+      size: 2196771
+      nfiles: 3
+  train:
+    cmd: PYTHONPATH="." python src/train.py
+    deps:
+    - path: data/prepare.dir
+      md5: c5c3d9fa5cc056883ec947646ca54585.dir
+      size: 2199979
+      nfiles: 7
+    - path: src/train.py
+      md5: cdbccda0df3c7b448e7ff060c32c3448
+      size: 3813
+    outs:
+    - path: data/train.dir
+      md5: 00d11900e9338639d8d711343fa10989.dir
+      size: 345475986
+      nfiles: 14
