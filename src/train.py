@@ -1,4 +1,5 @@
 from pathlib import Path
+from torchvision import transforms
 import numpy as np
 from datasets import DatasetDict, load_from_disk
 import evaluate
@@ -17,6 +18,34 @@ def compute_metrics(eval_pred):
     predictions, labels = eval_pred
     predictions = np.argmax(predictions, axis=1)
     return accuracy.compute(predictions=predictions, references=labels)
+
+def preprocess(image):
+    # convert image to tensor
+    tensor = transforms.ToTensor()(image)
+    tensor = tensor - np.mean(tensor.numpy()) + 128
+    tensor[tensor < 0] = 0
+    tensor[tensor > 255] = 255
+    tensor = tensor / 255
+    # repeat the tensor two ore times to get 3 channels and use the repeat function
+    tensor = tensor.repeat(3, 1, 1)
+    return tensor
+
+
+class Preprocess:
+    def __init__(self):
+        self.transforms = transforms.Compose(
+            [
+                transforms.Lambda(preprocess),
+                transforms.CenterCrop(224),
+            ]
+        )
+
+    def __call__(self, example_batch):
+        example_batch["pixel_values"] = [
+            self.transforms(img) for img in example_batch["image"]
+        ]
+        del example_batch["image"]
+        return example_batch
 
 def train(dataset):
     split_one = dataset.train_test_split(test_size=0.2, seed=42)
@@ -63,6 +92,8 @@ def train(dataset):
     data_collator = DefaultDataCollator()
     image_processor = AutoImageProcessor.from_pretrained(checkpoint)
 
+    train_test_valid_dataset.set_transform(Preprocess())
+    
     trainer = Trainer(
             model=model,
             args=training_args,
@@ -73,7 +104,7 @@ def train(dataset):
             compute_metrics=compute_metrics,
             )
     trainer.train()
-    return dataset, trainer
+    return train_test_valid_dataset, trainer
 
 if __name__ == '__main__':
     Path('data/train.dir').mkdir(parents=True, exist_ok=True)

@@ -1,5 +1,6 @@
 numpy==1.23.5
 evaluate
+torchvision
 transformers==4.26.1
 boto3
 datasets==2.12.0
