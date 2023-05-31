@@ -57,7 +57,7 @@ def train(dataset):
                 "test": split_two["test"],
                 }
             )
-    train_test_valid_dataset.with_transform(Preprocess())
+    train_test_valid_dataset = train_test_valid_dataset.with_transform(Preprocess())
 
     checkpoint = "google/vit-base-patch16-224-in21k"
     labels = dataset.features["label"].names
