@@ -57,20 +57,22 @@ def train(dataset):
                 "test": split_two["test"],
                 }
             )
+    train_test_valid_dataset.with_transform(Preprocess())
 
+    checkpoint = "google/vit-base-patch16-224-in21k"
     labels = dataset.features["label"].names
     label2id, id2label = dict(), dict()
     for i, label in enumerate(labels):
         label2id[label] = str(i)
         id2label[str(i)] = label 
 
-    checkpoint = "google/vit-base-patch16-224-in21k"
     model = AutoModelForImageClassification.from_pretrained(
             checkpoint,
             num_labels=len(labels),
             id2label=id2label,
             label2id=label2id
             )
+    model.to('cuda')
 
     batch_size = 14 * 16
     training_args = TrainingArguments(
@@ -92,7 +94,6 @@ def train(dataset):
     data_collator = DefaultDataCollator()
     image_processor = AutoImageProcessor.from_pretrained(checkpoint)
 
-    train_test_valid_dataset.set_transform(Preprocess())
     
     trainer = Trainer(
             model=model,
