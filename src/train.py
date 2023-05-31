@@ -19,34 +19,6 @@ def compute_metrics(eval_pred):
     predictions = np.argmax(predictions, axis=1)
     return accuracy.compute(predictions=predictions, references=labels)
 
-def preprocess(image):
-    # convert image to tensor
-    tensor = transforms.ToTensor()(image)
-    tensor = tensor - np.mean(tensor.numpy()) + 128
-    tensor[tensor < 0] = 0
-    tensor[tensor > 255] = 255
-    tensor = tensor / 255
-    # repeat the tensor two ore times to get 3 channels and use the repeat function
-    tensor = tensor.repeat(3, 1, 1)
-    return tensor
-
-
-class Preprocess:
-    def __init__(self):
-        self.transforms = transforms.Compose(
-            [
-                transforms.Lambda(preprocess),
-                transforms.CenterCrop(224),
-            ]
-        )
-
-    def __call__(self, example_batch):
-        example_batch["pixel_values"] = [
-            self.transforms(img) for img in example_batch["image"]
-        ]
-        del example_batch["image"]
-        return example_batch
-
 def train(dataset):
     split_one = dataset.train_test_split(test_size=0.2, seed=42)
     split_two = split_one["test"].train_test_split(test_size=0.5, seed=42)
@@ -57,9 +29,9 @@ def train(dataset):
                 "test": split_two["test"],
                 }
             )
-    train_test_valid_dataset = train_test_valid_dataset.with_transform(Preprocess())
 
     checkpoint = "google/vit-base-patch16-224-in21k"
+
     labels = dataset.features["label"].names
     label2id, id2label = dict(), dict()
     for i, label in enumerate(labels):

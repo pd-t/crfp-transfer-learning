@@ -3,26 +3,40 @@ from datasets import concatenate_datasets, Dataset, load_from_disk
 from pathlib import Path
 
 
-def compute_mean(image):
-    image = np.array(image)
-    return np.mean(image)
+def preprocess(image):
+    # convert image to tensor
+    tensor = transforms.ToTensor()(image)
+    tensor = tensor - np.mean(tensor.numpy()) + 128
+    tensor[tensor < 0] = 0
+    tensor[tensor > 255] = 255
+    tensor = tensor / 255
+    # repeat the tensor two ore times to get 3 channels and use the repeat function
+    tensor = tensor.repeat(3, 1, 1)
+    return tensor
 
 
-def compute_std(image):
-    image = np.array(image)
-    return np.std(image)
+class Preprocess:
+    def __init__(self):
+        self.transforms = transforms.Compose(
+            [
+                transforms.Lambda(preprocess),
+                transforms.CenterCrop(224),
+            ]
+        )
 
-
-def add_mean_and_std(example):
-    example["mean"] = compute_mean(example["image"])
-    example["std"] = compute_std(example["image"])
-    return example
-
+    def __call__(self, example_batch):
+        example_batch["pixel_values"] = [
+            self.transforms(img) for img in example_batch["image"]
+        ]
+        del example_batch["image"]
+        return example_batch
 
 def prepare(dataset: Dataset) -> Dataset:
-    dataset_mean_std = dataset.map(add_mean_and_std)
-    clean_dataset = dataset_mean_std.filter(lambda example: example["mean"] != 0)
-    labels = clean_dataset.features["label"].names
+    dataset = dataset.filter(lambda example: np.mean(example["image"]) != 0)
+    
+    dataset = dataset.with_transform(Preprocess())
+
+    labels = dataset.features["label"].names
     label2id, id2label = dict(), dict()
 
     for i, label in enumerate(labels):
@@ -31,7 +45,7 @@ def prepare(dataset: Dataset) -> Dataset:
     labelids = [int(id) for id in id2label.keys()]
 
     sorted_datasets = [
-            clean_dataset.filter(lambda example: example["label"] == labelid, batch_size=1024)
+            dataset.filter(lambda example: example["label"] == labelid, batch_size=1024)
             for labelid in labelids
             ]
     
