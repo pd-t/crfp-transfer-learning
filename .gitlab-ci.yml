@@ -34,6 +34,8 @@ dvc-repro-and-push:
   stage: learn
   tags:
     - aime
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   cache:
     paths:
       - .cache/pip
