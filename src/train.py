@@ -73,13 +73,12 @@ def train(dataset):
             compute_metrics=compute_metrics,
             )
     trainer.train()
+    return dataset, trainer
 
 if __name__ == '__main__':
     Path('data/train.dir').mkdir(parents=True, exist_ok=True)
-
-    prepapred_dataset = load_from_disk("data/prepare.dir/dataset")
-    
-    trained_dataset = train(prepapred_dataset)
-
+    prepared_dataset = load_from_disk("data/prepare.dir/dataset")
+    trained_dataset, trianed_trainer = train(prepared_dataset)
     trained_dataset.save_to_disk('data/train.dir/dataset')
+    trianed_trainer.save_model("data/train.dir/model")
 
