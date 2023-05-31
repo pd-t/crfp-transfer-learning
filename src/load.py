@@ -49,6 +49,7 @@ def load(
 
     print('load: create dataset')
     dataset = load_dataset("imagefolder", data_dir='data/tmp.dir', split="train")
+    dataset = dataset.shuffle(seed=42).select(range(1000))
     return dataset
 
 if __name__ == '__main__':

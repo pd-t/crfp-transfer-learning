@@ -6,15 +6,14 @@ echo '[CML] pull dvc data'
 dvc pull || true
 
 echo '[CML] dvc repro'
-if dvc repro || true
+if dvc repro
   then
     echo '[CML] dvc repro success!'
   else
     echo '[CML] dvc repro error!'
-    exit 1
 fi
 
-dvc commit
+dvc commit -f
 dvc push
 git add dvc.lock
 
@@ -28,4 +27,5 @@ if git commit -m '[CML] Add new dvc.lock'
   else
     echo '[CML] dvc is up-to-date, ready for release!'
 fi
+
 
