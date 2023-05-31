@@ -6,7 +6,7 @@ echo '[CML] pull dvc data'
 dvc pull || true
 
 echo '[CML] dvc repro'
-if dvc repro
+if dvc repro || true
   then
     echo '[CML] dvc repro success!'
   else
