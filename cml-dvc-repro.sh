@@ -1,7 +1,7 @@
 #!/bin/bash
 
-git config --local user.email "cml@gitlab.wogra.com"
-git config --local user.name "Gitlab CML"
+git config user.email "cml@gitlab.wogra.com"
+git config user.name "Gitlab CML"
 echo '[CML] pull dvc data'
 dvc pull || true
 
@@ -11,9 +11,10 @@ if dvc repro
     echo '[CML] dvc repro success!'
   else
     echo '[CML] dvc repro error!'
+    exit 1
 fi
 
-dvc commit -f
+dvc commit
 dvc push
 git add dvc.lock
 
