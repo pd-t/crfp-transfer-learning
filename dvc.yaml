@@ -1,6 +1,6 @@
 stages:
   load:
-    cmd: PYTHONPATH="." python src/load.py
+    cmd: PYTHONPATH="." python3 src/load.py
     params:
       - data.remote.s3_endpoint
       - data.remote.s3_bucket

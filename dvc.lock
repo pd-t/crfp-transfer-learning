@@ -1,0 +1,18 @@
+schema: '2.0'
+stages:
+  load:
+    cmd: PYTHONPATH="." python3 src/load.py
+    deps:
+    - path: src/load.py
+      md5: 8afc1eca3fc8957d454925eff539a310
+      size: 1813
+    params:
+      params.yaml:
+        data.remote.s3_bucket: data
+        data.remote.s3_endpoint: https://storage.s3.mlops.wogra.com
+        data.remote.s3_path: dlr/my_best_tapelegen_model.zip
+    outs:
+    - path: data/load.dir
+      md5: af8331560f6eff828e8a443f0b0a2d3f.dir
+      size: 26497564
+      nfiles: 3
