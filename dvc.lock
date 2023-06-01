@@ -43,6 +43,6 @@ stages:
       size: 3813
     outs:
     - path: data/train.dir
-      md5: 00d11900e9338639d8d711343fa10989.dir
+      md5: 2743416628bda8971f1ff8ba2d69a17e.dir
       size: 345475986
       nfiles: 14
