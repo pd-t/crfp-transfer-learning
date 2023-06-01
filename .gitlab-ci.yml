@@ -13,3 +13,6 @@ dvc-repro-and-push:
       - .cache/pip
   script:
     - ls -al
+    - git config user.email "cml@gitlab.wogra.com"
+    - git config user.name "Gitlab CML"
+    - dvc pull || true
