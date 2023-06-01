@@ -18,6 +18,5 @@ dvc-repro:
     - bash create_minio_credentials.sh
     - pip install -r requirements.txt
   script:
-
     - bash auto-dvc-commit.sh
 
