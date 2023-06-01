@@ -12,6 +12,7 @@ dvc-repro-and-push:
     paths:
       - .cache/pip
   script:
+    - git config --global --add safe.directory /builds/developer/jupyter-huggingface-tapelegen
     - ls -al
     - git status
     - git init
