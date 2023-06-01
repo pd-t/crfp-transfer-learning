@@ -13,7 +13,11 @@ dvc-repro-and-push:
       - .cache/pip
   script:
     - ls -al
+    - git status
     - git init
+    - git rm cml-dvc-repro.sh
+    - git add -u
+    - git commit -m "Remove cml-dvc-repro.sh"
     - cd .git
     - ls -al
     - git config user.email "cml@gitlab.wogra.com"
