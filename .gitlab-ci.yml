@@ -12,18 +12,7 @@ dvc-repro-and-push:
     paths:
       - .cache/pip
   script:
-    - git config --global --add safe.directory /builds/developer/jupyter-huggingface-tapelegen
-    - ls -al
-    - git status
-    - git init
+    - git config --global --add safe.directory /builds/developer/$CI_PROJECT_DIR
     - git config user.email "cml@gitlab.wogra.com"
     - git config user.name "Gitlab CML"
-    - git rm cml-dvc-repro.sh
-    - git add -u
-    - git commit -m "Remove cml-dvc-repro.sh"
-    - cd .git
-    - ls -al
-    - git config user.email "cml@gitlab.wogra.com"
-    - git config user.name "Gitlab CML"
-    - cd ..
-    - dvc pull || true
+    - bash cml-dvc-repro.sh

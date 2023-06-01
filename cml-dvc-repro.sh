@@ -1,12 +1,5 @@
 #!/bin/bash
 
-echo 'show directory'
-ls -al
-
-
-git config user.email "cml@gitlab.wogra.com"
-git config user.name "Gitlab CML"
-
 echo '[DvC] pull dvc data'
 dvc pull || true
 
@@ -19,17 +12,12 @@ if dvc repro
     exit 1
 fi
 
-#make the same as above but dont do exit 1 but save false to a variable
-
 echo '[CML] dvc commit and push'
-
-
-
 dvc commit
 dvc push
-git add dvc.lock
 
-echo '[CML] git commit'
+echo '[CML] git commit dvc.lock'
+git add dvc.lock
 if git commit -m '[CML] Add new dvc.lock'
   then
     export GIT_SSL_NO_VERIFY=1
