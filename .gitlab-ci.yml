@@ -16,6 +16,8 @@ dvc-repro-and-push:
     - ls -al
     - git status
     - git init
+    - git config user.email "cml@gitlab.wogra.com"
+    - git config user.name "Gitlab CML"
     - git rm cml-dvc-repro.sh
     - git add -u
     - git commit -m "Remove cml-dvc-repro.sh"
