@@ -1,4 +1,4 @@
-schema: '2.0'
+cschema: '2.0'
 stages:
   load:
     cmd: PYTHONPATH="." python3 src/load.py
