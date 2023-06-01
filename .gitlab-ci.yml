@@ -14,7 +14,7 @@ dvc-repro:
   script:
     - echo "$CI_PROJECT_DIR"
     - git init
-    - git config --global --add safe.directory /builds/developer/$CI_PROJECT_DIR
+    - git config --global --add safe.directory $CI_PROJECT_DIR
     - git config user.email "cml@gitlab.wogra.com"
     - git config user.name "Gitlab CML"
     - bash cml-dvc-repro.sh
