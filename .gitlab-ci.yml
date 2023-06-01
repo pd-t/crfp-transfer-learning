@@ -12,8 +12,9 @@ dvc-repro-and-push:
     paths:
       - .cache/pip
   script:
-    - git init
     - ls -al
+    - cd .git
     - git config user.email "cml@gitlab.wogra.com"
     - git config user.name "Gitlab CML"
+    - cd ..
     - dvc pull || true
