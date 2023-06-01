@@ -1,9 +1,9 @@
 stages:
-  - learn
+  - train
 
-dvc-repro-and-push:
+dvc-repro:
   image: ludwigai/ludwig-ray-gpu:0.7.4
-  stage: learn
+  stage: train
   tags:
     - aime
   variables:
@@ -12,7 +12,10 @@ dvc-repro-and-push:
     paths:
       - .cache/pip
   script:
+    - echo "$CI_PROJECT_DIR"
+    - git init
     - git config --global --add safe.directory /builds/developer/$CI_PROJECT_DIR
     - git config user.email "cml@gitlab.wogra.com"
     - git config user.name "Gitlab CML"
     - bash cml-dvc-repro.sh
+
