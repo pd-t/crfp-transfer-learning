@@ -1,8 +1,13 @@
 #!/bin/bash
 
+echo 'show directory'
+ls -al
+
+
 git config user.email "cml@gitlab.wogra.com"
 git config user.name "Gitlab CML"
-echo '[CML] pull dvc data'
+
+echo '[DvC] pull dvc data'
 dvc pull || true
 
 echo '[CML] dvc repro'
@@ -13,6 +18,12 @@ if dvc repro
     echo '[CML] dvc repro error!'
     exit 1
 fi
+
+#make the same as above but dont do exit 1 but save false to a variable
+
+echo '[CML] dvc commit and push'
+
+
 
 dvc commit
 dvc push

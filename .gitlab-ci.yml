@@ -13,7 +13,3 @@ dvc-repro-and-push:
       - .cache/pip
   script:
     - ls -al
-    - git init
-    - pip install -r requirements.txt
-    - bash create_minio_credentials.sh
-    - bash cml-dvc-repro.sh
