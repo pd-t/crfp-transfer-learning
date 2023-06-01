@@ -11,9 +11,10 @@ dvc-repro:
   cache:
     paths:
       - .cache/pip
-  script:
-    - echo "$CI_PROJECT_DIR"
+  before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
+    - pip install -r requirements.txt
+  script:
     - git config user.email "cml@gitlab.wogra.com"
     - git config user.name "Gitlab CML"
     - bash cml-dvc-repro.sh
