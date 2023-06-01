@@ -19,5 +19,5 @@ dvc-repro:
     - pip install -r requirements.txt
   script:
 
-    - bash cml-dvc-repro.sh
+    - bash auto-dvc-commit.sh
 
