@@ -35,6 +35,6 @@ stages:
       - src/train.py
     outs:
       - data/train.dir
-    plots:
+    metrics:
       - log.json
 
