@@ -5,3 +5,4 @@ data
 .cache
 .devcontainer/devcontainer.env
 /log.json
+dvc_plots
