@@ -4,3 +4,4 @@ data
 .env
 .cache
 .devcontainer/devcontainer.env
+/log.json
