@@ -1,48 +1,59 @@
-cschema: '2.0'
+schema: '2.0'
 stages:
   load:
     cmd: PYTHONPATH="." python3 src/load.py
     deps:
     - path: src/load.py
-      md5: 8afc1eca3fc8957d454925eff539a310
-      size: 1813
+      md5: a4f79b82458c6ec571686c88bc1c5cc8
+      size: 1755
     params:
       params.yaml:
         data.remote.s3_bucket: data
-        data.remote.s3_endpoint: https://storage.s3.mlops.wogra.com
-        data.remote.s3_path: dlr/my_best_tapelegen_model.zip
+        data.remote.s3_endpoint_url: https://storage.s3.mlops.wogra.com
+        data.remote.s3_path: dlr/Tapelegedaten2023.zip
     outs:
     - path: data/load.dir
-      md5: ab7ebaf0960708e590cf5a389ec08b0b.dir
-      size: 26524244
+      md5: 5766a5f3e24b300fe9bbc10ef1325ee8.dir
+      size: 27040487
       nfiles: 10
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
-      md5: ab7ebaf0960708e590cf5a389ec08b0b.dir
-      size: 26524244
+      md5: 5766a5f3e24b300fe9bbc10ef1325ee8.dir
+      size: 27040487
       nfiles: 10
     - path: src/prepare.py
-      md5: 2bbf51ab757b198c8e2bf64b9210d885
-      size: 1164
+      md5: f1bda56fc9db37162b9ef1627ce66076
+      size: 1157
     outs:
     - path: data/prepare.dir
-      md5: c5c3d9fa5cc056883ec947646ca54585.dir
-      size: 2199979
-      nfiles: 7
+      md5: 3fe68407614c6ef9ab4b45ec71097593.dir
+      size: 2196771
+      nfiles: 3
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
     - path: data/prepare.dir
-      md5: c5c3d9fa5cc056883ec947646ca54585.dir
-      size: 2199979
-      nfiles: 7
+      md5: 3fe68407614c6ef9ab4b45ec71097593.dir
+      size: 2196771
+      nfiles: 3
     - path: src/train.py
-      md5: cdbccda0df3c7b448e7ff060c32c3448
-      size: 3813
+      md5: d9badc20f1e67b939221723858a040db
+      size: 4129
+    params:
+      params.yaml:
+        model.batch_size: 256
+        model.checkpoint: google/vit-base-patch16-224-in21k
+        model.eval-test-size: 0.2
+        model.learning_rate: 5e-05
+        model.loading_steps: 10
+        model.num_train_epochs: 10
+        model.seed: 42
+        model.test-size: 0.5
+        model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: 2743416628bda8971f1ff8ba2d69a17e.dir
-      size: 345475986
-      nfiles: 14
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
