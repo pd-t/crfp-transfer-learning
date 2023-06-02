@@ -4,8 +4,6 @@ from pathlib import Path
 
 def prepare(dataset: Dataset) -> Dataset:
     dataset = dataset.filter(lambda example: np.mean(example["image"]) != 0)
-    
-
 
     labels = dataset.features["label"].names
     label2id, id2label = dict(), dict()
@@ -34,4 +32,3 @@ if __name__ == '__main__':
     loaded_dataset = load_from_disk("data/load.dir/dataset")
     prepared_dataset = prepare(loaded_dataset)
     prepared_dataset.save_to_disk('data/prepare.dir/dataset')
-

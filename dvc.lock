@@ -35,25 +35,27 @@ stages:
     cmd: PYTHONPATH="." python src/train.py
     deps:
     - path: data/prepare.dir
-      md5: 3fe68407614c6ef9ab4b45ec71097593.dir
-      size: 2196771
-      nfiles: 3
+      md5: ec202076507657588ca0f04402bac739.dir
+      size: 2199979
+      nfiles: 7
     - path: src/train.py
-      md5: d9badc20f1e67b939221723858a040db
-      size: 4129
+      md5: cfa0c1bbaf409760fa23c133b55bfb2d
+      size: 4128
     params:
       params.yaml:
         model.batch_size: 256
         model.checkpoint: google/vit-base-patch16-224-in21k
         model.eval-test-size: 0.2
+        model.gradient_accumulation_steps: 4
         model.learning_rate: 5e-05
         model.loading_steps: 10
+        model.logging_steps: 10
         model.num_train_epochs: 10
         model.seed: 42
         model.test-size: 0.5
         model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: d751713988987e9331980363e24189ce.dir
-      size: 0
-      nfiles: 0
+      md5: 8960434d711fc948520dca4c3806c659.dir
+      size: 345475986
+      nfiles: 14

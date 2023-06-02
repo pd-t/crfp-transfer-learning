@@ -11,8 +11,7 @@ from transformers import (
     Trainer,
     TrainingArguments,
 )
-
-from torchvision import transforms
+import dvc.api
 
 def preprocess(image):
     # convert image to tensor
@@ -50,9 +49,15 @@ def compute_metrics(eval_pred):
     predictions = np.argmax(predictions, axis=1)
     return accuracy.compute(predictions=predictions, references=labels)
 
-def train_test_split(dataset):
-    split_one = dataset.train_test_split(test_size=0.2, seed=42)
-    split_two = split_one["test"].train_test_split(test_size=0.5, seed=42)
+def train_test_split(dataset, **kwargs):
+    split_one = dataset.train_test_split(
+        test_size=kwargs["eval-test-size"], 
+        seed=kwargs["seed"]
+    )
+    split_two = split_one["test"].train_test_split(
+        test_size=kwargs["test-size"], 
+        seed=kwargs["seed"]
+    )
     dataset = DatasetDict(
             {
                 "train": split_one["train"],
@@ -62,9 +67,9 @@ def train_test_split(dataset):
             )
     return dataset
 
-def train(dataset):
+def train(dataset, **kwargs):
     dataset = dataset.with_transform(Preprocess())
-    checkpoint = "google/vit-base-patch16-224-in21k"
+    checkpoint = kwargs["checkpoint"]
 
     labels = dataset["train"].features["label"].names
     label2id, id2label = dict(), dict()
@@ -80,19 +85,18 @@ def train(dataset):
             )
     model.to('cuda')
 
-    batch_size = 14 * 16
     training_args = TrainingArguments(
             output_dir="./data/tmp.dir/model",
             remove_unused_columns=False,
             evaluation_strategy="epoch",
             save_strategy="epoch",
-        learning_rate=5e-5,
-        per_device_train_batch_size=batch_size,
-        gradient_accumulation_steps=4,
-        per_device_eval_batch_size=batch_size,
-        num_train_epochs=10,
-        warmup_ratio=0.1,
-        logging_steps=10,
+        learning_rate=kwargs["learning_rate"],
+        per_device_train_batch_size=kwargs["batch_size"],
+        gradient_accumulation_steps=kwargs["gradient_accumulation_steps"],
+        per_device_eval_batch_size=kwargs["batch_size"],
+        num_train_epochs=kwargs["num_train_epochs"],
+        warmup_ratio=kwargs["warmup_ratio"],
+        logging_steps=kwargs["logging_steps"],
         load_best_model_at_end=True,
         metric_for_best_model="accuracy",
     )
@@ -117,9 +121,13 @@ if __name__ == '__main__':
     Path('data/tmp.dir').mkdir(parents=True, exist_ok=True)
     Path('data/train.dir').mkdir(parents=True, exist_ok=True)
 
-    prepared_dataset = load_from_disk("data/prepare.dir/dataset")
-    splitted_dataset = train_test_split(prepared_dataset)
-    splitted_dataset.save_to_disk('data/train.dir/dataset')
+    params = dvc.api.params_show(stages=['train'])
 
-    trianed_trainer = train(splitted_dataset)
+    prepared_dataset = load_from_disk("data/prepare.dir/dataset")
+    splitted_dataset = train_test_split(prepared_dataset, **params['model'])
+    splitted_dataset.save_to_disk(
+        'data/train.dir/dataset', 
+        )
+
+    trianed_trainer = train(splitted_dataset, **params['model'])
     trianed_trainer.save_model("data/train.dir/model")

@@ -3,6 +3,6 @@
 {
 	"name": "Python 3",
 	"image": "ludwigai/ludwig-ray-gpu:0.7.4",
-	"runArgs": ["--env-file",".devcontainer/devcontainer.env"],
-	"postCreateCommand": "pip install -r requirements.txt"
+	"postCreateCommand": "pip install -r requirements.txt",
+	"runArgs": ["--env-file",".devcontainer/devcontainer.env"]
 }

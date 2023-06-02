@@ -2,7 +2,7 @@ stages:
   load:
     cmd: PYTHONPATH="." python3 src/load.py
     params:
-      - data.remote.s3_endpoint
+      - data.remote.s3_endpoint_url
       - data.remote.s3_bucket
       - data.remote.s3_path
     deps:
@@ -18,6 +18,18 @@ stages:
       - data/prepare.dir
   train:
     cmd: PYTHONPATH="." python src/train.py
+    params:
+      - model.checkpoint
+      - model.eval-test-size
+      - model.test-size
+      - model.seed
+      - model.batch_size
+      - model.num_train_epochs
+      - model.learning_rate
+      - model.warmup_ratio
+      - model.loading_steps
+      - model.gradient_accumulation_steps
+      - model.logging_steps
     deps:
       - data/prepare.dir
       - src/train.py
