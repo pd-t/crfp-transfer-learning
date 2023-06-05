@@ -56,9 +56,9 @@ stages:
         model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: 7f814eca0791345071aee0ace70d3d91.dir
+      md5: a5fac0374fee37f637643d56c86e9a97.dir
       size: 345475986
       nfiles: 14
     - path: log.json
-      md5: fbefdde365ec06c68816c983ed03baea
-      size: 2053
+      md5: 838bb3991f6aff42a6041ebcbaafa152
+      size: 2147
