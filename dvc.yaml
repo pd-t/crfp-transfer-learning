@@ -35,6 +35,14 @@ stages:
       - src/train.py
     outs:
       - data/train.dir
-    metrics:
-      - log.json
-
+  evaluate:
+    cmd: PYTHONPATH="." python src/eval.py
+    params:
+      - model.scaling
+    deps:
+      - data/train.dir
+      - src/eval.py
+    outs:
+      - data/evaluate.dir
+    plots:
+      - data/test.json

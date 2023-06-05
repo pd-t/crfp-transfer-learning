@@ -28,9 +28,9 @@ stages:
       size: 1157
     outs:
     - path: data/prepare.dir
-      md5: 3fe68407614c6ef9ab4b45ec71097593.dir
-      size: 2196771
-      nfiles: 3
+      md5: ec202076507657588ca0f04402bac739.dir
+      size: 2199979
+      nfiles: 7
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
@@ -39,8 +39,8 @@ stages:
       size: 2199979
       nfiles: 7
     - path: src/train.py
-      md5: ea6b213e93d01e8ab546def6aecbd2b1
-      size: 4271
+      md5: d5e8ba7a893df44fab30325ebf9cd205
+      size: 4128
     params:
       params.yaml:
         model.batch_size: 256
@@ -56,9 +56,6 @@ stages:
         model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: a5fac0374fee37f637643d56c86e9a97.dir
+      md5: f2e5c4b3b8c3f4974b256320572c83cd.dir
       size: 345475986
       nfiles: 14
-    - path: log.json
-      md5: 838bb3991f6aff42a6041ebcbaafa152
-      size: 2147

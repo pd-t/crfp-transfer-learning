@@ -16,3 +16,4 @@ model:
   loading_steps: 10
   gradient_accumulation_steps: 4
   logging_steps: 10
+  scaling: 10

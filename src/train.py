@@ -131,10 +131,3 @@ if __name__ == '__main__':
 
     trained_trainer = train(splitted_dataset, **params['model'])
     trained_trainer.save_model("data/train.dir/model")
-
-    log = {"train": trained_trainer.state.log_history }
-    import json
-
-    with open('log.json', 'w') as fp:
-        json.dump(log, fp)
-    
