@@ -59,3 +59,27 @@ stages:
       md5: f2e5c4b3b8c3f4974b256320572c83cd.dir
       size: 345475986
       nfiles: 14
+  evaluate:
+    cmd: PYTHONPATH="." python src/eval.py
+    deps:
+    - path: data/train.dir
+      md5: f2e5c4b3b8c3f4974b256320572c83cd.dir
+      size: 345475986
+      nfiles: 14
+    - path: src/eval.py
+      md5: 9f912e7cc105faaa613e87d13d55ec1e
+      size: 776
+    params:
+      params.yaml:
+        model.scaling: 10
+    outs:
+    - path: data/evaluate.dir
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: data/metrics.json
+      md5: ef648762e3cf4923826b5fddc39db1ca
+      size: 302
+    - path: data/tests.json
+      md5: ef648762e3cf4923826b5fddc39db1ca
+      size: 302

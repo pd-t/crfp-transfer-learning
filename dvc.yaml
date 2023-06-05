@@ -45,4 +45,6 @@ stages:
     outs:
       - data/evaluate.dir
     plots:
-      - data/test.json
+      - data/tests.json
+    metrics:
+      - data/metrics.json
