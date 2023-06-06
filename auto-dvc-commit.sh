@@ -12,8 +12,8 @@ if dvc repro
     exit 1
 fi
 
-dvc commit
-dvc push -f
+dvc commit -f
+dvc push
 git add dvc.lock
 
 echo '[DVC] git commit'
