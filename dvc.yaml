@@ -39,27 +39,40 @@ stages:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
       - data/train.dir
+      - src/train.py
       - src/eval.py
-    plots:
-      - data/accuracy.json:
-          x: epoch
-          y: accuracy
-      - data/loss.json:
-          x: epoch
-          y: loss
-      - data/cm.json:
-          x: actual_label
-          y: predicted_label
+plots:
+  - Accuracy:
+      x: 
+        data/accuracy.json: epoch
+      y: 
+        data/accuracy.json: eval_accuracy
+      x_label: Epoch
+      y_label: Accuracy
+  - LossFunction:
+      x: 
+        data/loss.json: epoch
+      y: 
+        data/loss.json: eval_loss
+      x_label: Epoch
+      y_label: Loss Function
+  - ConfusionMatrix:
+          x: 
+            data/cm.json: actual_label
+          y: 
+            data/cm.json: predicted_label
           title: Confusion Matrix for Test Data
           template: confusion
           x_label: Actual label
           y_label: Predicted label
-      - data/cm.json:
-          x: actual_label
-          y: predicted_label
+  - CondusionMatrixNormalized:
+          x: 
+            data/cm.json: actual_label
+          y: 
+            data/cm.json: predicted_label
           title: Confusion Matrix for Test Data (Normalized)
           template: confusion_normalized
           x_label: Actual label
           y_label: Predicted label
-    metrics:
-      - data/metrics.json
+metrics:
+  - data/metrics.json

@@ -14,14 +14,14 @@ def extract_values_from_log(trainer_log, key):
 def write_values_to_json(trainer_log, key, file_name):
     values = extract_values_from_log(trainer_log, key)
     epochs = extract_values_from_log(trainer_log, "epoch")
-    data = [{"epoch": epoch, key: value}  for epoch, value in zip(epochs, values)]
+    data = {"train": [{"epoch": epoch, key: value}  for epoch, value in zip(epochs, values)]}
     write_json(file_name, data)
 
 def write_metrics(trainer_log, keys, file_name):
     metrics = {key: extract_values_from_log(trainer_log, key)[-1] for key in keys}
     write_json(file_name, metrics)
 
-def evaluate(trainer_log, dataset, checkpoints):
+def evaluate(trainer_log):
     write_values_to_json(trainer_log, "eval_loss", "data/loss.json")
     write_values_to_json(trainer_log, "eval_accuracy", "data/accuracy.json")
     write_metrics(trainer_log, ["eval_loss", "eval_accuracy"], "data/metrics.json")
@@ -30,15 +30,6 @@ if __name__=='__main__':
     params = dvc.api.params_show(stages=['evaluate'])
 
     trained_dataset = load_from_disk("data/train.dir/dataset")
-    trained_checkpoints = 'data/train.dir/model'
     trainer_log = load_json("data/train.dir/trainer_log.json")
     
-    #load data/train.dir/predicted_labels.json
-    predicted_labels = load_json("data/train.dir/tested_labels.json")
-    # save to data/cm.json
-    write_json("data/cm.json", predicted_labels)
-
-
-
-    
-    evaluate(trainer_log, trained_dataset, trained_checkpoints)
+    evaluate(trainer_log)

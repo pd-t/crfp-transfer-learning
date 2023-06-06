@@ -67,15 +67,8 @@ stages:
       size: 345480693
       nfiles: 16
     - path: src/eval.py
-      md5: 034f95daa49c0c805f0b689fb3cfe868
-      size: 1595
-    outs:
-    - path: data/accuracy.json
-      md5: 897c3b5c9b3bc0b297725bcec29c5183
-      size: 778
-    - path: data/loss.json
-      md5: b7d6085a24c9ab3fe7a4c366a9e1c107
-      size: 751
-    - path: data/metrics.json
-      md5: c839388f76e7ab3f91a1833de7a34866
-      size: 80
+      md5: 416d6b3ef442bb667ff5bc1d79595f37
+      size: 1296
+    - path: src/train.py
+      md5: ad2c5fe4fcf1b9cca42486f7565d57df
+      size: 4874
