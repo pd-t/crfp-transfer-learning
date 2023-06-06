@@ -50,35 +50,32 @@ stages:
         model.learning_rate: 5e-05
         model.loading_steps: 10
         model.logging_steps: 10
-        model.num_train_epochs: 1
+        model.num_train_epochs: 10
         model.seed: 42
         model.test-size: 0.5
         model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: 71e6b95c006360ba99ec0463492707ea.dir
-      size: 345477950
+      md5: 0ac9bac067f5b0c336d429ad81c04e59.dir
+      size: 345480693
       nfiles: 16
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
     - path: data/train.dir
-      md5: 71e6b95c006360ba99ec0463492707ea.dir
-      size: 345477950
+      md5: 0ac9bac067f5b0c336d429ad81c04e59.dir
+      size: 345480693
       nfiles: 16
     - path: src/eval.py
       md5: 034f95daa49c0c805f0b689fb3cfe868
       size: 1595
     outs:
     - path: data/accuracy.json
-      md5: 976b93bb46ae991c73bf829b8fedc836
-      size: 81
-    - path: data/cm.json
-      md5: 01638cb904ac7a008eab021eb777b933
-      size: 1359
+      md5: 897c3b5c9b3bc0b297725bcec29c5183
+      size: 778
     - path: data/loss.json
-      md5: f5f4bc21121a4e3d829ae77224061671
-      size: 77
+      md5: b7d6085a24c9ab3fe7a4c366a9e1c107
+      size: 751
     - path: data/metrics.json
-      md5: 4249cde052f60d950610df47c33ca95c
+      md5: c839388f76e7ab3f91a1833de7a34866
       size: 80

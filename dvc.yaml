@@ -54,6 +54,12 @@ stages:
           template: confusion
           x_label: Actual label
           y_label: Predicted label
-
+      - data/cm.json:
+          x: actual_label
+          y: predicted_label
+          title: Confusion Matrix for Test Data (Normalized)
+          template: confusion_normalized
+          x_label: Actual label
+          y_label: Predicted label
     metrics:
       - data/metrics.json
