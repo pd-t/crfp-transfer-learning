@@ -58,18 +58,18 @@ plots:
       y_label: Loss Function
   - ConfusionMatrix:
           x: 
-            data/cm.json: actual_label
+            data/tested_labels.json: actual_label
           y: 
-            data/cm.json: predicted_label
+            data/tested_labels.json: predicted_label
           title: Confusion Matrix for Test Data
           template: confusion
           x_label: Actual label
           y_label: Predicted label
   - CondusionMatrixNormalized:
           x: 
-            data/cm.json: actual_label
+            data/tested_labels.json: actual_label
           y: 
-            data/cm.json: predicted_label
+            data/tested_labels.json: predicted_label
           title: Confusion Matrix for Test Data (Normalized)
           template: confusion_normalized
           x_label: Actual label

@@ -31,7 +31,7 @@ def load(
     local_path: str,
     **kwargs
 ) -> datasets.Dataset:
-
+    print(kwargs)
     print('load: download data')
     download_data_from_s3(
             endpoint_url=kwargs["remote"]["s3_endpoint_url"],
@@ -48,7 +48,7 @@ def load(
 
     print('load: create dataset')
     dataset = load_dataset("imagefolder", data_dir='data/tmp.dir/images', split="train")
-    dataset = dataset.shuffle(seed=42).select(range(1000))
+    dataset = dataset.shuffle(kwargs["seed"]).select(kwargs["select"])
     return dataset
 
 if __name__ == '__main__':

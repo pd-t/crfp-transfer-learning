@@ -148,5 +148,5 @@ if __name__ == '__main__':
 
     trainer_log = {"trainer": trained_trainer.state.log_history}
     write_json('data/train.dir/trainer_log.json', trainer_log)
-    write_json('data/train.dir/tested_labels.json', tested_labels)
+    write_json('data/tested_labels.json', tested_labels)
  

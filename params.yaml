@@ -3,6 +3,8 @@ data:
     s3_endpoint_url: 'https://storage.s3.mlops.wogra.com'
     s3_bucket: 'data'
     s3_path: 'dlr/Tapelegedaten2023.zip'
+  seed: 42
+  select: 1000
 
 model:
   checkpoint: 'google/vit-base-patch16-224-in21k'
