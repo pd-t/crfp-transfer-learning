@@ -12,8 +12,8 @@ else
     echo "[DvC] dvc repro failed."
 fi
 
-dvc commit
-dvc push
+dvc commit -q
+dvc push -v
 git add dvc.lock
 
 if [ $dvc_repro_exit_status -eq 0 ]; then
