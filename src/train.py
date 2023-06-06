@@ -12,6 +12,7 @@ from transformers import (
     TrainingArguments,
 )
 import dvc.api
+import json
 
 def preprocess(image):
     # convert image to tensor
@@ -131,3 +132,8 @@ if __name__ == '__main__':
 
     trained_trainer = train(splitted_dataset, **params['model'])
     trained_trainer.save_model("data/train.dir/model")
+
+    trainer_log = {"trainer": trained_trainer.state.log_history}
+    # write trainer log to json file in a human readable format
+    with open('data/train.dir/trainer_log.json', 'w') as f:
+        json.dump(trainer_log, f, indent=4)
