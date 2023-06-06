@@ -4,21 +4,23 @@ echo '[DvC] execute dvc pipeline'
 dvc pull || true
 dvc repro
 dvc_repro_exit_status=$?
+echo "[DvC] dvc repro exit status: $dvc_repro_exit_status"
 
 if [ $dvc_repro_exit_status -eq 0 ]; then
     echo "[DvC] dvc repro executed successfully."
 else
-    echo "[DvC] dvc repro failed with exit status: $dvc_repro_exit_status."
+    echo "[DvC] dvc repro failed."
 fi
 
 dvc commit
 dvc push
 git add dvc.lock
 git_add_dvc_lock=$?
+echo "[DvC] git add dvc.lock exit status: $git_add_dvc_lock"
 
 if [ $git_add_dvc_lock -eq 0 ]; then
     export GIT_SSL_NO_VERIFY=1
-    echo "[DvC] dvc.lock changed. Commit Changes."
+    echo "[DvC] dvc.lock changed. Commit dvc.lock."
     if [ $dvc_repro_exit_status -eq 0 ]; then
         git commit -m "[DvC] dvc.lock changes."
     else
