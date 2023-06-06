@@ -5,6 +5,8 @@ stages:
       - data.remote.s3_endpoint_url
       - data.remote.s3_bucket
       - data.remote.s3_path
+      - data.seed
+      - data.select
     deps:
       - src/load.py
     outs:
