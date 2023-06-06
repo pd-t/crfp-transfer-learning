@@ -4,23 +4,25 @@ stages:
     cmd: PYTHONPATH="." python3 src/load.py
     deps:
     - path: src/load.py
-      md5: a4f79b82458c6ec571686c88bc1c5cc8
-      size: 1755
+      md5: 3c3d38c3c44a3c1b6acd842b2ca25a6b
+      size: 1773
     params:
       params.yaml:
         data.remote.s3_bucket: data
         data.remote.s3_endpoint_url: https://storage.s3.mlops.wogra.com
         data.remote.s3_path: dlr/Tapelegedaten2023.zip
+        data.seed: 42
+        data.select: 1000
     outs:
     - path: data/load.dir
-      md5: 5766a5f3e24b300fe9bbc10ef1325ee8.dir
-      size: 27040487
-      nfiles: 10
+      md5: d8a89477241d53cacb9cc03e493074f6.dir
+      size: 27013807
+      nfiles: 3
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
-      md5: 5766a5f3e24b300fe9bbc10ef1325ee8.dir
+      md5: b4214eb6d85da19417d1ce81a2a168cc.dir
       size: 27040487
       nfiles: 10
     - path: src/prepare.py
@@ -28,14 +30,14 @@ stages:
       size: 1157
     outs:
     - path: data/prepare.dir
-      md5: ec202076507657588ca0f04402bac739.dir
-      size: 2199979
-      nfiles: 7
+      md5: 201cec92332bd8b3ccf2e8dff5ab42da.dir
+      size: 2196771
+      nfiles: 3
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
     - path: data/prepare.dir
-      md5: ec202076507657588ca0f04402bac739.dir
+      md5: 03f566088f00e5c18705293d6bc872ca.dir
       size: 2199979
       nfiles: 7
     - path: src/train.py
@@ -56,15 +58,15 @@ stages:
         model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: 7997594738a5ed55544744a087cfa720.dir
-      size: 345479345
+      md5: 27f6c89e61c8277b7f35d21dfa3a815e.dir
+      size: 345479333
       nfiles: 15
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
     - path: data/train.dir
-      md5: 7997594738a5ed55544744a087cfa720.dir
-      size: 345479345
+      md5: 27f6c89e61c8277b7f35d21dfa3a815e.dir
+      size: 345479333
       nfiles: 15
     - path: src/eval.py
       md5: 416d6b3ef442bb667ff5bc1d79595f37
