@@ -58,14 +58,14 @@ stages:
         model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: 67cbc76f1d6be4d999d0eab24cb86627.dir
+      md5: d15fc9eb6c546b7cd57afc01c4ccbf50.dir
       size: 347873432
       nfiles: 15
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
     - path: data/train.dir
-      md5: 67cbc76f1d6be4d999d0eab24cb86627.dir
+      md5: d15fc9eb6c546b7cd57afc01c4ccbf50.dir
       size: 347873432
       nfiles: 15
     - path: src/eval.py
