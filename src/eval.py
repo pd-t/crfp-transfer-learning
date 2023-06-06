@@ -2,32 +2,43 @@ import json
 from pathlib import Path
 import dvc.api
 from datasets import load_from_disk
+from train import write_json
 
-def evaluate(trainer_log, dataset, **kwargs):
-    eval_loss = [item["eval_loss"] for item in trainer_log["trainer"] if "eval_loss" in item.keys()]
-    eval_accuracy = [item["eval_accuracy"] for item in trainer_log["trainer"] if "eval_accuracy" in item.keys()]
+def load_json(file_name):
+    with open(file_name, 'r') as f:
+        return json.load(f)
 
-    plots = [{"loss": loss, "accuracy": accuracy}  for loss, accuracy in zip(eval_loss, eval_accuracy)]
-    with open('data/plots.json', 'w') as f:
-        json.dump({"train": plots}, f, indent=4)
+def extract_values_from_log(trainer_log, key):
+    return [item[key] for item in trainer_log["trainer"] if key in item.keys()]
 
-    metrics = {"loss": eval_loss[-1], "accuracy": eval_accuracy[-1]}
-    with open('data/metrics.json', 'w') as f:
-        json.dump({"train": metrics}, f, indent=4)
-    
-    # create an empty file in evaluate.dir
-    Path('data/evaluate.dir/evaluate').touch()
+def write_values_to_json(trainer_log, key, file_name):
+    values = extract_values_from_log(trainer_log, key)
+    epochs = extract_values_from_log(trainer_log, "epoch")
+    data = [{"epoch": epoch, key: value}  for epoch, value in zip(epochs, values)]
+    write_json(file_name, data)
 
+def write_metrics(trainer_log, keys, file_name):
+    metrics = {key: extract_values_from_log(trainer_log, key)[-1] for key in keys}
+    write_json(file_name, metrics)
+
+def evaluate(trainer_log, dataset, checkpoints):
+    write_values_to_json(trainer_log, "eval_loss", "data/loss.json")
+    write_values_to_json(trainer_log, "eval_accuracy", "data/accuracy.json")
+    write_metrics(trainer_log, ["eval_loss", "eval_accuracy"], "data/metrics.json")
 
 if __name__=='__main__':
-    Path('data/evaluate.dir').mkdir(parents=True, exist_ok=True)
-
     params = dvc.api.params_show(stages=['evaluate'])
 
     trained_dataset = load_from_disk("data/train.dir/dataset")
-    # read trainer_log.json file as a dictionary
-    with open('data/train.dir/trainer_log.json', 'r') as f:
-        trainer_log = json.load(f)
-    print(trainer_log)
-    print(type(trainer_log))
-    evaluate(trainer_log, trained_dataset, **params)
+    trained_checkpoints = 'data/train.dir/model'
+    trainer_log = load_json("data/train.dir/trainer_log.json")
+    
+    #load data/train.dir/predicted_labels.json
+    predicted_labels = load_json("data/train.dir/tested_labels.json")
+    # save to data/cm.json
+    write_json("data/cm.json", predicted_labels)
+
+
+
+    
+    evaluate(trainer_log, trained_dataset, trained_checkpoints)

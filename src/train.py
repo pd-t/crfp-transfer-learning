@@ -50,6 +50,13 @@ def compute_metrics(eval_pred):
     predictions = np.argmax(predictions, axis=1)
     return accuracy.compute(predictions=predictions, references=labels)
 
+def predict(trainer, dataset):
+    prediction = trainer.predict(dataset)
+    predicted_labels = np.argmax(prediction.predictions, axis=1)
+    id2label = dataset.features["label"].names
+    result = {"labels": [{"actual_label": id2label[a], "predicted_label": id2label[p]} for a, p in zip(prediction.label_ids, predicted_labels)]}
+    return result
+
 def train_test_split(dataset, **kwargs):
     split_one = dataset.train_test_split(
         test_size=kwargs["eval-test-size"], 
@@ -116,7 +123,13 @@ def train(dataset, **kwargs):
             compute_metrics=compute_metrics,
             )
     trainer.train()
-    return trainer
+
+    test_labels = predict(trainer, dataset["test"])
+    return trainer, test_labels
+
+def write_json(file_name, data):
+    with open(file_name, 'w') as f:
+        json.dump(data, f, indent=4)
 
 if __name__ == '__main__':
     Path('data/tmp.dir').mkdir(parents=True, exist_ok=True)
@@ -130,10 +143,10 @@ if __name__ == '__main__':
         'data/train.dir/dataset', 
         )
 
-    trained_trainer = train(splitted_dataset, **params['model'])
+    trained_trainer, tested_labels = train(splitted_dataset, **params['model'])
     trained_trainer.save_model("data/train.dir/model")
 
     trainer_log = {"trainer": trained_trainer.state.log_history}
-    # write trainer log to json file in a human readable format
-    with open('data/train.dir/trainer_log.json', 'w') as f:
-        json.dump(trainer_log, f, indent=4)
+    write_json('data/train.dir/trainer_log.json', trainer_log)
+    write_json('data/train.dir/tested_labels.json', tested_labels)
+ 

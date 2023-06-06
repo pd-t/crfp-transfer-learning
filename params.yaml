@@ -10,10 +10,9 @@ model:
   test-size: 0.5
   seed: 42
   batch_size: 256
-  num_train_epochs: 10
+  num_train_epochs: 1
   learning_rate: 5e-5
   warmup_ratio: 0.1
   loading_steps: 10
   gradient_accumulation_steps: 4
   logging_steps: 10
-  scaling: 10

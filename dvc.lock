@@ -39,8 +39,8 @@ stages:
       size: 2199979
       nfiles: 7
     - path: src/train.py
-      md5: 99282aed1e0d8e449e39815cc6e6424f
-      size: 4374
+      md5: ad2c5fe4fcf1b9cca42486f7565d57df
+      size: 4874
     params:
       params.yaml:
         model.batch_size: 256
@@ -50,36 +50,35 @@ stages:
         model.learning_rate: 5e-05
         model.loading_steps: 10
         model.logging_steps: 10
-        model.num_train_epochs: 10
+        model.num_train_epochs: 1
         model.seed: 42
         model.test-size: 0.5
         model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: b80702d20b91a1931d2f9e5dce852010.dir
-      size: 345479332
-      nfiles: 15
+      md5: 71e6b95c006360ba99ec0463492707ea.dir
+      size: 345477950
+      nfiles: 16
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
     - path: data/train.dir
-      md5: b80702d20b91a1931d2f9e5dce852010.dir
-      size: 345479332
-      nfiles: 15
+      md5: 71e6b95c006360ba99ec0463492707ea.dir
+      size: 345477950
+      nfiles: 16
     - path: src/eval.py
-      md5: c9229632e945733aa084139ef4b0c9eb
-      size: 1269
-    params:
-      params.yaml:
-        model.scaling: 10
+      md5: 034f95daa49c0c805f0b689fb3cfe868
+      size: 1595
     outs:
-    - path: data/evaluate.dir
-      md5: 1f3f17cfa5b2fc1d04294578a7d825b7.dir
-      size: 0
-      nfiles: 1
+    - path: data/accuracy.json
+      md5: 976b93bb46ae991c73bf829b8fedc836
+      size: 81
+    - path: data/cm.json
+      md5: 01638cb904ac7a008eab021eb777b933
+      size: 1359
+    - path: data/loss.json
+      md5: f5f4bc21121a4e3d829ae77224061671
+      size: 77
     - path: data/metrics.json
-      md5: 23b5b584f95d48cc00e0f3d5bc2646a0
-      size: 99
-    - path: data/plots.json
-      md5: 9a6d4339c802acc92e57834484c5f2cc
-      size: 1046
+      md5: 4249cde052f60d950610df47c33ca95c
+      size: 80

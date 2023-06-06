@@ -37,14 +37,23 @@ stages:
       - data/train.dir
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
-    params:
-      - model.scaling
     deps:
       - data/train.dir
       - src/eval.py
-    outs:
-      - data/evaluate.dir
     plots:
-      - data/plots.json
+      - data/accuracy.json:
+          x: epoch
+          y: accuracy
+      - data/loss.json:
+          x: epoch
+          y: loss
+      - data/cm.json:
+          x: actual_label
+          y: predicted_label
+          title: Confusion Matrix for Test Data
+          template: confusion
+          x_label: Actual label
+          y_label: Predicted label
+
     metrics:
       - data/metrics.json
