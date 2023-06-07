@@ -19,3 +19,20 @@ dvc-repro:
     - pip install -r requirements.txt
   script:
     - bash auto-dvc-commit.sh
+
+cml:
+  image: iterativeai/cml:0-dvc2-base1 # Python, DVC, & CML pre-installed
+  script:
+    - dvc pull
+
+    - echo "## Metrics: workflow vs. main" >> report.md
+    - git fetch --depth=1 origin main:main
+    - dvc metrics diff --show-md main >> report.md
+
+    - echo "## Plots" >> report.md
+    
+    - dvc plots diff --target Accuracy --show-vega main > vega.json
+    - vl2png vega.json > plot.png
+    - echo '![](./plot.png "Accuracy")' >> report.md
+
+    - cml comment create report.md
