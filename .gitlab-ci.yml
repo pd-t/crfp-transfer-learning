@@ -25,7 +25,7 @@ cml:
   script:
     - dvc pull
 
-    - echo "## Metrics: workflow vs. main" >> report.md
+    - echo "## Metrics workflow vs. main" >> report.md
     - git fetch --depth=1 origin main:main
     - dvc metrics diff --show-md main >> report.md
 
