@@ -1,9 +1,10 @@
 stages:
   - train
+  - report
 
 dvc-repro:
-  image: ludwigai/ludwig-ray-gpu:0.7.4
   stage: train
+  image: ludwigai/ludwig-ray-gpu:0.7.4
   tags:
     - aime
   variables:
@@ -21,6 +22,7 @@ dvc-repro:
     - bash auto-dvc-commit.sh
 
 cml:
+  stage: report
   image: iterativeai/cml:0-dvc2-base1 # Python, DVC, & CML pre-installed
   script:
     - dvc pull
