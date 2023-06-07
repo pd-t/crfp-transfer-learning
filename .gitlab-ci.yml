@@ -1,5 +1,25 @@
 stages:
+  - train
   - report
+
+dvc-repro:
+  stage: train
+  image: ludwigai/ludwig-ray-gpu:0.7.4
+  tags:
+    - aime
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  cache:
+    paths:
+      - .cache/pip
+  before_script:
+    - git config --global --add safe.directory $CI_PROJECT_DIR
+    - git config user.email "cml@gitlab.wogra.com"
+    - git config user.name "Gitlab CML"
+    - bash create_minio_credentials.sh
+    - pip install -r requirements.txt
+  script:
+    - bash auto-dvc-commit.sh
 
 cml:
   stage: report
@@ -7,18 +27,11 @@ cml:
   before_script:
     - bash create_minio_credentials.sh
   script:
-    - dvc pull
+    - dvc pull --run-cache
 
-    - echo "## Metrics workflow vs. main" >> report.md
+    - echo "Metrics workflow vs. main" >> report.md
     - git fetch --depth=1 origin main:main
     - dvc metrics diff --show-md main >> report.md
-
-    - echo "## My Plots" >> report.md
-    
-    - dvc plots diff --target Accuracy --show-vega main > vega.json
-    - cat vega.json
-    - vl2png vega.json > plot2.png
-    - echo '![](./plot2.png "Accuracy")' >> report.md
 
     - cml comment create report.md
   artifacts:
