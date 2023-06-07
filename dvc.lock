@@ -12,33 +12,33 @@ stages:
         data.remote.s3_endpoint_url: https://storage.s3.mlops.wogra.com
         data.remote.s3_path: dlr/Tapelegedaten2023.zip
         data.seed: 42
-        data.select: 3000
+        data.select: 10000
     outs:
     - path: data/load.dir
-      md5: 89ba8566dcc03ac43d26eb6c7aa5cda8.dir
-      size: 56002021
+      md5: 885ce6d88627ee4e784dd96d8df2b851.dir
+      size: 156677997
       nfiles: 10
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
-      md5: 89ba8566dcc03ac43d26eb6c7aa5cda8.dir
-      size: 56002021
+      md5: 885ce6d88627ee4e784dd96d8df2b851.dir
+      size: 156677997
       nfiles: 10
     - path: src/prepare.py
       md5: f1bda56fc9db37162b9ef1627ce66076
       size: 1157
     outs:
     - path: data/prepare.dir
-      md5: e15342ea10155da3e0aefddff5b21207.dir
-      size: 6482019
+      md5: 6e6d70e765c0f6b871682c1a1d904fad.dir
+      size: 19755283
       nfiles: 7
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
     - path: data/prepare.dir
-      md5: e15342ea10155da3e0aefddff5b21207.dir
-      size: 6482019
+      md5: 6e6d70e765c0f6b871682c1a1d904fad.dir
+      size: 19755283
       nfiles: 7
     - path: src/train.py
       md5: 31cffee0b82c73c92499855adef867fb
@@ -58,15 +58,15 @@ stages:
         model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: b63d70636351d6c40a39100b1942aa9e.dir
-      size: 349758650
+      md5: 95637506a66a530a3589749c7c316223.dir
+      size: 363023220
       nfiles: 15
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
     - path: data/train.dir
-      md5: b63d70636351d6c40a39100b1942aa9e.dir
-      size: 349758650
+      md5: 95637506a66a530a3589749c7c316223.dir
+      size: 363023220
       nfiles: 15
     - path: src/eval.py
       md5: 416d6b3ef442bb667ff5bc1d79595f37

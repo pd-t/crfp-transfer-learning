@@ -27,16 +27,10 @@ cml:
   before_script:
     - bash create_minio_credentials.sh
   script:
-    - dvc pull
+    - dvc pull --run-cache
 
-    - echo "## Metrics workflow vs. main" >> report.md
+    - echo "Metrics workflow vs. main" >> report.md
     - git fetch --depth=1 origin main:main
     - dvc metrics diff --show-md main >> report.md
-
-    - echo "## Plots" >> report.md
-    
-    - dvc plots diff --target Accuracy --show-vega main > vega.json
-    - vl2png vega.json > plot.png
-    - echo '![](./plot.png "Accuracy")' >> report.md
 
     - cml comment create report.md
