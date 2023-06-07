@@ -24,6 +24,8 @@ dvc-repro:
 cml:
   stage: report
   image: iterativeai/cml:0-dvc2-base1 # Python, DVC, & CML pre-installed
+  before_script:
+    - bash create_minio_credentials.sh
   script:
     - dvc pull
 
