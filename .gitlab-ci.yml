@@ -34,6 +34,3 @@ cml:
     - dvc metrics diff --show-md main >> report.md
 
     - cml comment create report.md
-  artifacts:
-    paths:
-      - vega.json
