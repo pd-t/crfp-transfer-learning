@@ -12,33 +12,33 @@ stages:
         data.remote.s3_endpoint_url: https://storage.s3.mlops.wogra.com
         data.remote.s3_path: dlr/Tapelegedaten2023.zip
         data.seed: 42
-        data.select: 2000
+        data.select: 10000
     outs:
     - path: data/load.dir
-      md5: dbba29dc39e9b626fa287425230a5f1b.dir
-      size: 41663637
+      md5: 885ce6d88627ee4e784dd96d8df2b851.dir
+      size: 156677997
       nfiles: 10
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
-      md5: dbba29dc39e9b626fa287425230a5f1b.dir
-      size: 41663637
+      md5: 885ce6d88627ee4e784dd96d8df2b851.dir
+      size: 156677997
       nfiles: 10
     - path: src/prepare.py
       md5: f1bda56fc9db37162b9ef1627ce66076
       size: 1157
     outs:
     - path: data/prepare.dir
-      md5: 0300e9d997c87009b507971b68916938.dir
-      size: 4595611
+      md5: 6e6d70e765c0f6b871682c1a1d904fad.dir
+      size: 19755283
       nfiles: 7
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
     - path: data/prepare.dir
-      md5: 0300e9d997c87009b507971b68916938.dir
-      size: 4595611
+      md5: 6e6d70e765c0f6b871682c1a1d904fad.dir
+      size: 19755283
       nfiles: 7
     - path: src/train.py
       md5: 31cffee0b82c73c92499855adef867fb
@@ -52,21 +52,21 @@ stages:
         model.learning_rate: 5e-05
         model.loading_steps: 10
         model.logging_steps: 10
-        model.num_train_epochs: 5
+        model.num_train_epochs: 10
         model.seed: 42
         model.test-size: 0.5
         model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: c115bc455755b380656e91fbc39a378a.dir
-      size: 347871839
+      md5: 95637506a66a530a3589749c7c316223.dir
+      size: 363023220
       nfiles: 15
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
     - path: data/train.dir
-      md5: c115bc455755b380656e91fbc39a378a.dir
-      size: 347871839
+      md5: 95637506a66a530a3589749c7c316223.dir
+      size: 363023220
       nfiles: 15
     - path: src/eval.py
       md5: 416d6b3ef442bb667ff5bc1d79595f37
