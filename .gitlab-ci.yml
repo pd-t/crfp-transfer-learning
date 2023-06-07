@@ -33,10 +33,10 @@ cml:
     - git fetch --depth=1 origin main:main
     - dvc metrics diff --show-md main >> report.md
 
-    - echo "## Plots" >> report.md
+    - echo "## My Plots" >> report.md
     
     - dvc plots diff --target Accuracy --show-vega main > vega.json
-    - vl2png vega.json > plot.png
-    - echo '![](./plot.png "Accuracy")' >> report.md
+    - vl2png vega.json > plot2.png
+    - echo '![](./plot2.png "Accuracy")' >> report.md
 
     - cml comment create report.md
