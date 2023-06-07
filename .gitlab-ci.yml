@@ -40,3 +40,6 @@ cml:
     - echo '![](./plot2.png "Accuracy")' >> report.md
 
     - cml comment create report.md
+  artifacts:
+    paths:
+      - vega.json
