@@ -36,6 +36,7 @@ cml:
     - echo "## My Plots" >> report.md
     
     - dvc plots diff --target Accuracy --show-vega main > vega.json
+    - cat vega.json
     - vl2png vega.json > plot2.png
     - echo '![](./plot2.png "Accuracy")' >> report.md
 
