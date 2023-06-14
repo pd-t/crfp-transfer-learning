@@ -74,3 +74,7 @@ stages:
     - path: src/train.py
       md5: 31cffee0b82c73c92499855adef867fb
       size: 4864
+    outs:
+    - path: data/metrics.json
+      md5: e1fee7372b7a40bd5ea8038850a5b1e3
+      size: 80

@@ -11,6 +11,7 @@ stages:
       - src/load.py
     outs:
       - data/load.dir
+
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
@@ -18,6 +19,7 @@ stages:
       - src/prepare.py
     outs:
       - data/prepare.dir
+
   train:
     cmd: PYTHONPATH="." python src/train.py
     params:
@@ -37,12 +39,16 @@ stages:
       - src/train.py
     outs:
       - data/train.dir
+
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
       - data/train.dir
       - src/train.py
       - src/eval.py
+    metrics:
+      - data/metrics.json
+
 plots:
   - Accuracy:
       x: 
@@ -76,5 +82,3 @@ plots:
           template: confusion_normalized
           x_label: Actual label
           y_label: Predicted label
-metrics:
-  - data/metrics.json
