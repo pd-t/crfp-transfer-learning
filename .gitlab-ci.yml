@@ -27,10 +27,14 @@ cml:
   before_script:
     - bash create_minio_credentials.sh
   script:
-    - dvc pull --run-cache
-
-    - echo "Metrics workflow vs. main" >> report.md
-    - git fetch --depth=1 origin main:main
-    - dvc metrics diff --show-md main >> report.md
+    - git fetch --depth=1 origin main
+    - latest_commit=$(git rev-parse origin/main)
+    - echo "$latest_commit"dd`dd`
+    
+    - dvc pull
+    - dvc repro
+    - dvc metrics show
+    - dvc metrics diff $latest_commit
+    - dvc metrics diff --show-md $latest_commit >> report.md
 
     - cml comment create report.md
