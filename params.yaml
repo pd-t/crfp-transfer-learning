@@ -4,7 +4,7 @@ data:
     s3_bucket: 'data'
     s3_path: 'dlr/Tapelegedaten2023.zip'
   seed: 42
-  select: 5000
+  select: 1000
 
 model:
   checkpoint: 'google/vit-base-patch16-224-in21k'
