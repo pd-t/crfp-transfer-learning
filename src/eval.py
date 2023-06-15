@@ -22,7 +22,6 @@ def write_metrics(trainer_log, keys, file_name):
     write_json(file_name, metrics)
 
 def evaluate(trainer_log):
-    write_values_to_json(trainer_log, "eval_loss", "plots.json")
     write_values_to_json(trainer_log, "eval_accuracy", "accuracy.json")
     write_values_to_json(trainer_log, "eval_loss", "loss.json")
     write_metrics(trainer_log, ["eval_loss", "eval_accuracy"], "metrics.json")
