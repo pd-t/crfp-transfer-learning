@@ -48,6 +48,7 @@ stages:
     plots:
       - accuracy.json
       - loss.json
+      - labels.json
     metrics:
       - metrics.json
 
