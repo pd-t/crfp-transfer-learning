@@ -69,18 +69,18 @@ stages:
       size: 4693
       nfiles: 2
     - path: src/eval.py
-      md5: 590176c6047d0d0ff28d310c4cda89f0
-      size: 1226
+      md5: 77b984401b2a3527ccc6e786f03c820b
+      size: 1323
     outs:
     - path: accuracy.json
       md5: ec06e2b7b045c9f6dcc8b6d9c8420675
       size: 945
+    - path: labels.json
+      md5: 5b327153a169024d6c1780f0c7f74759
+      size: 1359
     - path: loss.json
       md5: 7ae15af8d8c93f8b622f5607616f402c
       size: 932
     - path: metrics.json
       md5: 11098f6d2ad8e7be23bd41671be4138a
       size: 80
-    - path: plots.json
-      md5: 7ae15af8d8c93f8b622f5607616f402c
-      size: 932

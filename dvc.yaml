@@ -46,9 +46,29 @@ stages:
       - data/train.dir
       - src/eval.py
     plots:
-      - plots.json
       - accuracy.json
       - loss.json
+      - labels.json
     metrics:
       - metrics.json
+
+plots:
+  - ConfusionMatrix:
+          x: 
+            labels.json: actual_label
+          y: 
+            labels.json: predicted_label
+          title: Confusion Matrix for Test Data
+          template: confusion
+          x_label: Actual label
+          y_label: Predicted label
+  - CondusionMatrixNormalized:
+          x: 
+            labels.json: actual_label
+          y: 
+            labels.json: predicted_label
+          title: Confusion Matrix for Test Data (Normalized)
+          template: confusion_normalized
+          x_label: Actual label
+          y_label: Predicted label
 
