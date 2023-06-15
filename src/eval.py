@@ -22,14 +22,14 @@ def write_metrics(trainer_log, keys, file_name):
     write_json(file_name, metrics)
 
 def evaluate(trainer_log):
-    write_values_to_json(trainer_log, "eval_loss", "data/loss.json")
-    write_values_to_json(trainer_log, "eval_accuracy", "data/accuracy.json")
-    write_metrics(trainer_log, ["eval_loss", "eval_accuracy"], "data/metrics.json")
+    write_values_to_json(trainer_log, "eval_loss", "loss.json")
+    write_values_to_json(trainer_log, "eval_accuracy", "accuracy.json")
+    write_metrics(trainer_log, ["eval_loss", "eval_accuracy"], "metrics.json")
 
 if __name__=='__main__':
     params = dvc.api.params_show(stages=['evaluate'])
 
-    trained_dataset = load_from_disk("data/train.dir/dataset")
     trainer_log = load_json("data/train.dir/trainer_log.json")
     
     evaluate(trainer_log)
+

@@ -46,39 +46,8 @@ stages:
       - data/train.dir
       - src/train.py
       - src/eval.py
+    plots:
+      - plots.json
     metrics:
-      - data/metrics.json
+      - metrics.json
 
-plots:
-  - Accuracy:
-      x: 
-        data/accuracy.json: epoch
-      y: 
-        data/accuracy.json: eval_accuracy
-      x_label: Epoch
-      y_label: Accuracy
-  - LossFunction:
-      x: 
-        data/loss.json: epoch
-      y: 
-        data/loss.json: eval_loss
-      x_label: Epoch
-      y_label: Loss Function
-  - ConfusionMatrix:
-          x: 
-            data/tested_labels.json: actual_label
-          y: 
-            data/tested_labels.json: predicted_label
-          title: Confusion Matrix for Test Data
-          template: confusion
-          x_label: Actual label
-          y_label: Predicted label
-  - CondusionMatrixNormalized:
-          x: 
-            data/tested_labels.json: actual_label
-          y: 
-            data/tested_labels.json: predicted_label
-          title: Confusion Matrix for Test Data (Normalized)
-          template: confusion_normalized
-          x_label: Actual label
-          y_label: Predicted label
