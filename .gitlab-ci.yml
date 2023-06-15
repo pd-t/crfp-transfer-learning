@@ -39,18 +39,18 @@ cml:
     
     - dvc plots diff --target accuracy.json --show-vega $latest_commit > vega.json
     - vl2png vega.json > accuracy.png
-    - echo '![](./accuracy.png "Test")' >> report.md
+    - echo '![](./accuracy.png "Accuracy")' >> report.md
 
     - dvc plots diff --target loss.json --show-vega $latest_commit > vega.json
     - vl2png vega.json > loss.png
-    - echo '![](./loss.png "Test")' >> report.md
+    - echo '![](./loss.png "Loss")' >> report.md
 
     - dvc plots diff --target ConfusionMatrix --show-vega $latest_commit > vega.json
     - vl2png vega.json > cm.png
-    - echo '![](./cm.png "Test")' >> report.md
+    - echo '![](./cm.png "ConfusionMatrix")' >> report.md
 
     - dvc plots diff --target ConfusionMatrixNormalized --show-vega $latest_commit > vega.json
-    - vl2png vega.json > cm.png
-    - echo '![](./cm.png "Test")' >> report.md
+    - vl2png vega.json > cm_normalized.png
+    - echo '![](./cm_normalized.png "ConfusionMatrixNormalized")' >> report.md
 
     - cml comment create report.md
