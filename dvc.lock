@@ -12,33 +12,33 @@ stages:
         data.remote.s3_endpoint_url: https://storage.s3.mlops.wogra.com
         data.remote.s3_path: dlr/Tapelegedaten2023.zip
         data.seed: 42
-        data.select: 1000
+        data.select: 5000
     outs:
     - path: data/load.dir
-      md5: 2bba1dd2f8853f682a0ddb204e7f81cb.dir
-      size: 27482981
+      md5: a08ba2a601789b45528c4caeb5f1f7a1.dir
+      size: 84969093
       nfiles: 10
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
-      md5: 2bba1dd2f8853f682a0ddb204e7f81cb.dir
-      size: 27482981
+      md5: a08ba2a601789b45528c4caeb5f1f7a1.dir
+      size: 84969093
       nfiles: 10
     - path: src/prepare.py
       md5: f1bda56fc9db37162b9ef1627ce66076
       size: 1157
     outs:
     - path: data/prepare.dir
-      md5: 2e7ad93cc0d784ee8567b82bc2e241e4.dir
-      size: 2199979
+      md5: e64b33e45a0fb545bf0c2bccf44c3d95.dir
+      size: 10307635
       nfiles: 7
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
     - path: data/prepare.dir
-      md5: 2e7ad93cc0d784ee8567b82bc2e241e4.dir
-      size: 2199979
+      md5: e64b33e45a0fb545bf0c2bccf44c3d95.dir
+      size: 10307635
       nfiles: 7
     - path: src/train.py
       md5: f1c62bec554edc216c568ec50e4c6472
@@ -58,29 +58,26 @@ stages:
         model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: c7052f4e7c14d655e570ba9aac4f1362.dir
-      size: 4693
+      md5: 928fbd5df724c00b6af63247b6bd747f.dir
+      size: 9527
       nfiles: 2
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
     - path: data/train.dir
-      md5: c7052f4e7c14d655e570ba9aac4f1362.dir
-      size: 4693
+      md5: 928fbd5df724c00b6af63247b6bd747f.dir
+      size: 9527
       nfiles: 2
     - path: src/eval.py
       md5: 77b984401b2a3527ccc6e786f03c820b
       size: 1323
     outs:
     - path: accuracy.json
-      md5: ec06e2b7b045c9f6dcc8b6d9c8420675
-      size: 945
-    - path: labels.json
-      md5: 5b327153a169024d6c1780f0c7f74759
-      size: 1359
+      md5: 426fb72491680eed889b50763f11d96b
+      size: 974
     - path: loss.json
-      md5: 7ae15af8d8c93f8b622f5607616f402c
-      size: 932
+      md5: 61c01d77fcce13e3441f410cb7c78719
+      size: 931
     - path: metrics.json
-      md5: 11098f6d2ad8e7be23bd41671be4138a
+      md5: a85844b2e2a465af50ca000f954b60ec
       size: 80
