@@ -1,8 +1,11 @@
 data
+metrics.json
+plots.json
 .vscode
 .venv
 .env
 .cache
 .devcontainer/devcontainer.env
-/log.json
 dvc_plots
+/accuracy.json
+/loss.json

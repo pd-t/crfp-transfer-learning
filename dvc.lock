@@ -12,33 +12,33 @@ stages:
         data.remote.s3_endpoint_url: https://storage.s3.mlops.wogra.com
         data.remote.s3_path: dlr/Tapelegedaten2023.zip
         data.seed: 42
-        data.select: 5000
+        data.select: 1000
     outs:
     - path: data/load.dir
-      md5: 6e4a9f5f2027a53e02ad0572094d4aa4.dir
-      size: 84969093
+      md5: 2bba1dd2f8853f682a0ddb204e7f81cb.dir
+      size: 27482981
       nfiles: 10
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
-      md5: 6e4a9f5f2027a53e02ad0572094d4aa4.dir
-      size: 84969093
+      md5: 2bba1dd2f8853f682a0ddb204e7f81cb.dir
+      size: 27482981
       nfiles: 10
     - path: src/prepare.py
       md5: f1bda56fc9db37162b9ef1627ce66076
       size: 1157
     outs:
     - path: data/prepare.dir
-      md5: 8b1bace883fb4fc9f91c6e2188f2e07f.dir
-      size: 10307635
+      md5: 2e7ad93cc0d784ee8567b82bc2e241e4.dir
+      size: 2199979
       nfiles: 7
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
     - path: data/prepare.dir
-      md5: 8b1bace883fb4fc9f91c6e2188f2e07f.dir
-      size: 10307635
+      md5: 2e7ad93cc0d784ee8567b82bc2e241e4.dir
+      size: 2199979
       nfiles: 7
     - path: src/train.py
       md5: f1c62bec554edc216c568ec50e4c6472
@@ -58,23 +58,29 @@ stages:
         model.warmup_ratio: 0.1
     outs:
     - path: data/train.dir
-      md5: 6cc6becaededbd8bde7dc1b0fa268375.dir
-      size: 9524
+      md5: c7052f4e7c14d655e570ba9aac4f1362.dir
+      size: 4693
       nfiles: 2
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
     - path: data/train.dir
-      md5: 6cc6becaededbd8bde7dc1b0fa268375.dir
-      size: 9524
+      md5: c7052f4e7c14d655e570ba9aac4f1362.dir
+      size: 4693
       nfiles: 2
     - path: src/eval.py
-      md5: c93948d40edafb8078d5c1b73da892a7
-      size: 1090
+      md5: 590176c6047d0d0ff28d310c4cda89f0
+      size: 1226
     outs:
+    - path: accuracy.json
+      md5: ec06e2b7b045c9f6dcc8b6d9c8420675
+      size: 945
+    - path: loss.json
+      md5: 7ae15af8d8c93f8b622f5607616f402c
+      size: 932
     - path: metrics.json
-      md5: a278f96dddf1111d9dca1765e599b7b1
+      md5: 11098f6d2ad8e7be23bd41671be4138a
       size: 80
     - path: plots.json
-      md5: 3f3cd456c317de59d4a733d325c4d9f2
-      size: 931
+      md5: 7ae15af8d8c93f8b622f5607616f402c
+      size: 932
