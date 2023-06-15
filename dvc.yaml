@@ -54,18 +54,18 @@ stages:
 plots:
   - ConfusionMatrix:
           x: 
-            labels.json: actual_label
+            data/train.dir/tested_labels.json: actual_label
           y: 
-            labels.json: predicted_label
+            data/train.dir/tested_labels.json: predicted_label
           title: Confusion Matrix for Test Data
           template: confusion
           x_label: Actual label
           y_label: Predicted label
   - ConfusionMatrixNormalized:
           x: 
-            labels.json: actual_label
+            data/train.dir/tested_labels.json: actual_label
           y: 
-            labels.json: predicted_label
+            data/train.dir/tested_labels.json: predicted_label
           title: Confusion Matrix for Test Data (Normalized)
           template: confusion_normalized
           x_label: Actual label

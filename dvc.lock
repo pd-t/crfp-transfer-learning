@@ -75,6 +75,9 @@ stages:
     - path: accuracy.json
       md5: 426fb72491680eed889b50763f11d96b
       size: 974
+    - path: labels.json
+      md5: 4538442681aaf1e86b19704f6be7d26e
+      size: 6165
     - path: loss.json
       md5: 61c01d77fcce13e3441f410cb7c78719
       size: 931
