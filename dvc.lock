@@ -69,12 +69,15 @@ stages:
       size: 353581786
       nfiles: 15
     - path: src/eval.py
-      md5: 416d6b3ef442bb667ff5bc1d79595f37
-      size: 1296
+      md5: 9bdde48a51726558607583340c3e6bb4
+      size: 1148
     - path: src/train.py
       md5: 31cffee0b82c73c92499855adef867fb
       size: 4864
     outs:
-    - path: data/metrics.json
+    - path: metrics.json
       md5: e1fee7372b7a40bd5ea8038850a5b1e3
       size: 80
+    - path: plots.json
+      md5: dfad0cd177978d5bdf79ab6f1d6df43b
+      size: 934
