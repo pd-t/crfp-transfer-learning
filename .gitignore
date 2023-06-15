@@ -9,3 +9,4 @@ plots.json
 dvc_plots
 /accuracy.json
 /loss.json
+.vimspector.json
