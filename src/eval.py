@@ -1,8 +1,8 @@
 import json
-from pathlib import Path
-import dvc.api
-from datasets import load_from_disk
-from train import write_json
+
+def write_json(file_name, data):
+    with open(file_name, 'w') as f:
+        json.dump(data, f, indent=4)
 
 def load_json(file_name):
     with open(file_name, 'r') as f:
@@ -26,9 +26,6 @@ def evaluate(trainer_log):
     write_metrics(trainer_log, ["eval_loss", "eval_accuracy"], "metrics.json")
 
 if __name__=='__main__':
-    params = dvc.api.params_show(stages=['evaluate'])
-
     trainer_log = load_json("data/train.dir/trainer_log.json")
-    
     evaluate(trainer_log)
 

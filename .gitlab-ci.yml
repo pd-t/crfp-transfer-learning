@@ -29,7 +29,7 @@ cml:
   script:
     - git fetch --depth=1 origin main
     - latest_commit=$(git rev-parse origin/main)
-    - echo "$latest_commit"dd`dd`
+    - echo "$latest_commit"
     
     - dvc pull
     - dvc repro

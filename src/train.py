@@ -139,14 +139,10 @@ if __name__ == '__main__':
 
     prepared_dataset = load_from_disk("data/prepare.dir/dataset")
     splitted_dataset = train_test_split(prepared_dataset, **params['model'])
-    splitted_dataset.save_to_disk(
-        'data/train.dir/dataset', 
-        )
 
     trained_trainer, tested_labels = train(splitted_dataset, **params['model'])
-    trained_trainer.save_model("data/train.dir/model")
 
     trainer_log = {"trainer": trained_trainer.state.log_history}
     write_json('data/train.dir/trainer_log.json', trainer_log)
-    write_json('data/tested_labels.json', tested_labels)
+    write_json('data/train.dir/tested_labels.json', tested_labels)
  

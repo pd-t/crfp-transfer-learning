@@ -44,7 +44,6 @@ stages:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
       - data/train.dir
-      - src/train.py
       - src/eval.py
     plots:
       - plots.json
