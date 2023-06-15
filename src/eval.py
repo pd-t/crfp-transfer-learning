@@ -1,3 +1,4 @@
+from copy import copy
 import json
 
 def write_json(file_name, data):
@@ -27,6 +28,12 @@ def evaluate(trainer_log):
     write_metrics(trainer_log, ["eval_loss", "eval_accuracy"], "metrics.json")
 
 if __name__=='__main__':
+
+    tested_labels = load_json("data/train.dir/tested_labels.json")
     trainer_log = load_json("data/train.dir/trainer_log.json")
     evaluate(trainer_log)
+    # save tested labels
+    write_json("labels.json", tested_labels)
+
+
 

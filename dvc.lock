@@ -69,8 +69,8 @@ stages:
       size: 4693
       nfiles: 2
     - path: src/eval.py
-      md5: 3d56e794d498f02f6710a789431d83a2
-      size: 1161
+      md5: 77b984401b2a3527ccc6e786f03c820b
+      size: 1323
     outs:
     - path: accuracy.json
       md5: ec06e2b7b045c9f6dcc8b6d9c8420675
