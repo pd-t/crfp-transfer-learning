@@ -47,6 +47,8 @@ stages:
       - src/eval.py
     plots:
       - plots.json
+      - accuracy.json
+      - loss.json
     metrics:
       - metrics.json
 

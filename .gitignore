@@ -7,3 +7,5 @@ plots.json
 .cache
 .devcontainer/devcontainer.env
 dvc_plots
+/accuracy.json
+/loss.json
