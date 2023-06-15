@@ -49,4 +49,8 @@ cml:
     - vl2png vega.json > cm.png
     - echo '![](./cm.png "Test")' >> report.md
 
+    - dvc plots diff --target ConfusionMatrixNormalized --show-vega $latest_commit > vega.json
+    - vl2png vega.json > cm.png
+    - echo '![](./cm.png "Test")' >> report.md
+
     - cml comment create report.md

@@ -62,7 +62,7 @@ plots:
           template: confusion
           x_label: Actual label
           y_label: Predicted label
-  - CondusionMatrixNormalized:
+  - ConfusionMatrixNormalized:
           x: 
             labels.json: actual_label
           y: 
