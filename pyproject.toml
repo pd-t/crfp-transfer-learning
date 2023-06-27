@@ -7,6 +7,11 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"
+evaluate = "^0.4.0"
+transformers = "^4.30.2"
+datasets = "^2.13.1"
+dvc = "^3.2.2"
+dvc-s3 = "^2.23.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
