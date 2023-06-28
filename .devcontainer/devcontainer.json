@@ -6,14 +6,10 @@
 		"dockerfile": "Dockerfile",
 		"context": "..",
 		"args": { 
-			"USER_ID": "${localEnv:UID}",
-			"GROUP_ID": "${localEnv:UID}" 
+			"USER_NAME": "user",
+			"USER_UID": "${localEnv:UID}"
 		}
 	},
-	"postCreateCommand": "poetry config virtualenvs.create false && poetry install && pre-commit install",
-	"runArgs": ["--env-file",".devcontainer/devcontainer.env"],
-	"remoteUser": "ray",
-	"updateRemoteUserUID": true,
 	
 	"customizations": {
 		// Configure properties specific to VS Code.
@@ -28,8 +24,7 @@
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				"ms-python.python",
-				"ms-python.vscode-pylance",
-				"iterative.dvc"
+				"ms-python.vscode-pylance"
 			]
 		}
 	}
