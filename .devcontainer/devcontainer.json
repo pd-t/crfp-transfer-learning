@@ -4,21 +4,16 @@
 	"name": "Python 3",
 	"build": {
 		"dockerfile": "Dockerfile",
-		"context": "..",
-		"args": { 
-			"USER_NAME": "user",
-			"USER_UID": "${localEnv:UID}"
-		}
+		"context": ".."
 	},
-	
+	"remoteUser": "ray",
+
 	"customizations": {
 		// Configure properties specific to VS Code.
 		"vscode": {
 			// Set *default* container specific settings.json values on container create.
 			"settings": { 
-				"python.defaultInterpreterPath": "/home/ray/anaconda3/bin/python",
-				"python.linting.enabled": true,
-				"python.linting.pylintEnabled": true
+				"python.defaultInterpreterPath": "/home/ray/anaconda3/bin/python"
 			},
 			
 			// Add the IDs of extensions you want installed when the container is created.
