@@ -1,24 +1,26 @@
-FROM ludwigai/ludwig-ray:master
+FROM nvidia/cuda:11.8.0-base-ubuntu22.04
+RUN apt update && apt install -y --no-install-recommends git ssh python3 python3-pip
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
-USER root
-# Copy library scripts to execute
-RUN curl -o /tmp/common-debian.sh https://raw.githubusercontent.com/microsoft/vscode-dev-containers/main/script-library/common-debian.sh
+RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
-# [Option] Install zsh
-ARG INSTALL_ZSH="false"
-# [Option] Upgrade OS packages to their latest versions
-ARG UPGRADE_PACKAGES="false"
-# Install needed packages and use existing non-root user (ray).
-ARG USERNAME=automatic
+ARG USER_NAME=user
 ARG USER_UID=1000
-ARG USER_GID=102
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    # Remove imagemagick due to https://security-tracker.debian.org/tracker/CVE-2019-10131
-    && apt-get purge -y imagemagick imagemagick-6-common \
-    # Install common packages, non-root user
-    && bash /tmp/common-debian.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true" \
-    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+ARG USER_GID=$USER_UID
 
-RUN pip install pre-commit black pylint flake8 mypy
+# Create the user
+RUN groupadd --gid $USER_GID $USER_NAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USER_NAME \
+    #
+    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USER_NAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USER_NAME \
+    && chmod 0440 /etc/sudoers.d/$USER_NAME
 
-USER ${USER_UID}
+# ********************************************************
+# * Anything else you want to do like clean up goes here *
+# ********************************************************
+
+# [Optional] Set the default user. Omit if you want to keep the default as root.
+USER $USER_NAME

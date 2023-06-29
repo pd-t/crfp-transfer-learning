@@ -6,14 +6,18 @@
 		"dockerfile": "Dockerfile",
 		"context": ".."
 	},
-	"remoteUser": "ray",
+	"remoteUser": "user",
+	"remoteEnv": {
+		"PATH": "${containerEnv:PATH}:/home/user/.local/bin"
+	},
+	"postCreateCommand": "pip install poetry==1.5.1 && poetry config virtualenvs.in-project true && poetry install",
 
 	"customizations": {
 		// Configure properties specific to VS Code.
 		"vscode": {
 			// Set *default* container specific settings.json values on container create.
 			"settings": { 
-				"python.defaultInterpreterPath": "/home/ray/anaconda3/bin/python"
+				"python.defaultInterpreterPath": "/workspaces/jupyter-huggingface-tapelegen/.venv"
 			},
 			
 			// Add the IDs of extensions you want installed when the container is created.
