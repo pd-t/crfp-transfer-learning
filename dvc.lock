@@ -15,24 +15,27 @@ stages:
         data.select: 5000
     outs:
     - path: data/load.dir
-      md5: a08ba2a601789b45528c4caeb5f1f7a1.dir
-      size: 84969093
-      nfiles: 10
+      hash: md5
+      md5: 83ffec1ba5b769f7812d54e11cb0e410.dir
+      size: 84402887
+      nfiles: 3
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
-      md5: a08ba2a601789b45528c4caeb5f1f7a1.dir
-      size: 84969093
+      hash: md5
+      md5: ba1c5089b2c7445b05361b869df97cdd.dir
+      size: 84526599
       nfiles: 10
     - path: src/prepare.py
       md5: f1bda56fc9db37162b9ef1627ce66076
       size: 1157
     outs:
     - path: data/prepare.dir
-      md5: e64b33e45a0fb545bf0c2bccf44c3d95.dir
-      size: 10307635
-      nfiles: 7
+      hash: md5
+      md5: e0e3f017e36bf83cce4bd6c86750a7ac.dir
+      size: 10299219
+      nfiles: 3
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
