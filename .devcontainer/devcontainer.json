@@ -11,7 +11,7 @@
 		"PATH": "${containerEnv:PATH}:/home/user/.local/bin"
 	},
 	"runArgs": ["--env-file",".devcontainer/devcontainer.env","--gpus","all"],
-	"postCreateCommand": "pip install -r requirements.txt",
+	"postCreateCommand": "pip install poetry && poetry config virtualenvs.in-project true && poetry install",
 
 	"customizations": {
 		// Configure properties specific to VS Code.
@@ -24,7 +24,10 @@
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				"ms-python.python",
-				"ms-python.vscode-pylance"
+				"ms-python.vscode-pylance",
+				"ms-toolsai.jupyter",
+				"ms-python.black-formatter",
+				"iterative.dvc"
 			]
 		}
 	}

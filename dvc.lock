@@ -16,15 +16,15 @@ stages:
     outs:
     - path: data/load.dir
       hash: md5
-      md5: 032432b81c49b54b6b3d34c42bbca301.dir
-      size: 84526599
-      nfiles: 10
+      md5: 5942db6e62cf9566cb72ab552ccaf0b3.dir
+      size: 84402887
+      nfiles: 3
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
       hash: md5
-      md5: 032432b81c49b54b6b3d34c42bbca301.dir
+      md5: 8e0afab9debb1035f95907bffcb8bd29.dir
       size: 84526599
       nfiles: 10
     - path: src/prepare.py
@@ -33,15 +33,15 @@ stages:
     outs:
     - path: data/prepare.dir
       hash: md5
-      md5: e1bd2e0ad5d0f28ad26e2ed1bee6ad55.dir
-      size: 10307635
-      nfiles: 7
+      md5: f0dd21da9d77cef96de3625b05e31ee4.dir
+      size: 10299219
+      nfiles: 3
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
     - path: data/prepare.dir
       hash: md5
-      md5: e1bd2e0ad5d0f28ad26e2ed1bee6ad55.dir
+      md5: 76a8b323393c9495b38375e02191d729.dir
       size: 10307635
       nfiles: 7
     - path: src/train.py
@@ -63,7 +63,7 @@ stages:
     outs:
     - path: data/train.dir
       hash: md5
-      md5: b4a370606519d5e6113be6e2d0fda490.dir
+      md5: 9d573bd7111ef8af0809e8d3ae09b13a.dir
       size: 9529
       nfiles: 2
   evaluate:
@@ -71,7 +71,7 @@ stages:
     deps:
     - path: data/train.dir
       hash: md5
-      md5: b4a370606519d5e6113be6e2d0fda490.dir
+      md5: 9d573bd7111ef8af0809e8d3ae09b13a.dir
       size: 9529
       nfiles: 2
     - path: src/eval.py
@@ -80,13 +80,13 @@ stages:
     outs:
     - path: accuracy.json
       hash: md5
-      md5: 914fce135ae74856f805326091928f6c
-      size: 973
+      md5: b80aafac48b7e3a1f07e718f0bfa8ba0
+      size: 974
     - path: loss.json
       hash: md5
-      md5: 56e62389e63fcb32c39a53c044014787
-      size: 933
+      md5: 3303d76403a7d0d51710f535e9c9bf28
+      size: 932
     - path: metrics.json
       hash: md5
-      md5: 368e458f64ee4a11867fd55287240dbc
-      size: 80
+      md5: 24b45095ff548117da2eeb6367d5d718
+      size: 79

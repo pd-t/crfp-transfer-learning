@@ -2,7 +2,6 @@ __pycache__/
 data
 metrics.json
 plots.json
-.vscode
 .venv
 .env
 .cache
