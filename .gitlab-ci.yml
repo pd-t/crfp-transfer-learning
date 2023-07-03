@@ -19,7 +19,7 @@ dvc-repro:
     - bash create_minio_credentials.sh
     - bash scripts/install-dev-tools.sh
   script:
-    - poetry shell
+    - source .venv/bin/activatel
     - bash auto-dvc-commit.sh
 
 cml:
