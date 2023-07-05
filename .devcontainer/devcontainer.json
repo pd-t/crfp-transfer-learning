@@ -10,7 +10,7 @@
 	"remoteEnv": {
 		"PATH": "${containerEnv:PATH}:/home/user/.local/bin"
 	},
-	"runArgs": ["--env-file",".devcontainer/devcontainer.env","--gpus","all"],
+	"runArgs": ["--env-file",".devcontainer/devcontainer.env","--gpus","all", "--shm-size=10.24gb"],
 	"postCreateCommand": "bash scripts/install-dev-tools.sh",
 
 	"customizations": {
