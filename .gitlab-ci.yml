@@ -34,7 +34,7 @@ cml:
     - dvc repro
     - dvc metrics show
     - dvc metrics diff $latest_commit
-    - dvc metrics diff --show-md $latest_commit >> report.md
+    - dvc metrics diff --md $latest_commit >> report.md
     
     - dvc plots diff --target accuracy.json --show-vega $latest_commit > vega.json
     - vl2png vega.json > accuracy.png

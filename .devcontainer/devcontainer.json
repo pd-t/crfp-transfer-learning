@@ -11,8 +11,7 @@
 		"PATH": "${containerEnv:PATH}:/home/user/.local/bin"
 	},
 	"runArgs": ["--env-file",".devcontainer/devcontainer.env","--gpus","all"],
-	"postCreateCommand": "pip install poetry && poetry config virtualenvs.in-project true && poetry install",
-	"postCreateCommand": "bash scripts/install-dev-tools.sh"
+	"postCreateCommand": "bash scripts/install-dev-tools.sh",
 
 	"customizations": {
 		// Configure properties specific to VS Code.
