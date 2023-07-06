@@ -56,6 +56,6 @@ if __name__ == '__main__':
     
     params = dvc.api.params_show(stages=['load'])
     
-    loaded_dataset = load('data/data.zip', **params['data'])
+    loaded_dataset = load('data/tmp.dir/data.zip', **params['data'])
     
     loaded_dataset.save_to_disk('data/load.dir/dataset')
