@@ -9,7 +9,12 @@
 	"remoteUser": "user",
 	"runArgs": ["--env-file",".devcontainer/devcontainer.env","--gpus","all", "--shm-size=10.24gb"],
 	"postCreateCommand": "bash scripts/install-dev-tools.sh",
-
+	"mounts": [
+		// Re-use local SSH keys (useful if you use SSH keys for Git repo access or other SSH work)
+		"source=${localEnv:HOME}/.ssh,target=/home/user/.ssh,type=bind,consistency=cached",
+		// Re-use local Git configuration
+		"source=${localEnv:HOME}/.gitconfig,target=/home/user/.gitconfig,type=bind,consistency=cached"
+	],
 	"customizations": {
 		// Configure properties specific to VS Code.
 		"vscode": {
