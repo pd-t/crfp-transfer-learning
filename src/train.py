@@ -55,7 +55,8 @@ accuracy = evaluate.load("accuracy")
 def compute_metrics(eval_pred):
     predictions, labels = eval_pred
     predictions = np.argmax(predictions, axis=1)
-    return accuracy.compute(predictions=predictions, references=labels)
+    metrics = accuracy.compute(predictions=predictions, references=labels)
+    return metrics
 
 def predict(trainer, dataset):
     prediction = trainer.predict(dataset)
@@ -82,6 +83,7 @@ def train_test_split(dataset, **kwargs):
             )
     return dataset
 
+
 def train(dataset, **kwargs):
     dataset = dataset.with_transform(Preprocess())
     checkpoint = kwargs["checkpoint"]
@@ -92,13 +94,15 @@ def train(dataset, **kwargs):
         label2id[label] = str(i)
         id2label[str(i)] = label 
 
-    model = AutoModelForImageClassification.from_pretrained(
-            checkpoint,
-            num_labels=len(labels),
-            id2label=id2label,
-            label2id=label2id
-            )
-    model.to('cuda')
+    def model_init():
+        model = AutoModelForImageClassification.from_pretrained(
+                checkpoint,
+                num_labels=len(labels),
+                id2label=id2label,
+                label2id=label2id
+                )
+        model.to('cuda')
+        return model
 
     training_args = TrainingArguments(
             output_dir="./data/tmp.dir/model",
@@ -121,7 +125,7 @@ def train(dataset, **kwargs):
 
     
     trainer = Trainer(
-            model=model,
+            model_init=model_init,
             args=training_args,
             data_collator=data_collator,
             train_dataset=dataset["train"],
@@ -129,30 +133,10 @@ def train(dataset, **kwargs):
             tokenizer=image_processor,
             compute_metrics=compute_metrics,
             )
-    #trainer.train()
+ 
+    trainer.train()
 
-    #test_labels = predict(trainer, dataset["test"])
-    test_labels = None
-
-    space = {
-        "x": tune.uniform(-10, 10),
-        "y": tune.uniform(-10, 10),
-    }
-
-    search_alg = HyperOptSearch(
-        space, 
-        metric="mean_accuracy", 
-        mode="min"
-    )
-
-    tuner = tune.Tuner(
-        cost,
-        tune_config=tune.TuneConfig(
-            num_samples=1000,
-            search_alg=search_alg
-        )
-    )
-    results = tuner.fit()
+    test_labels = predict(trainer, dataset["test"])
     return trainer, test_labels
 
 def write_json(file_name, data):
