@@ -24,7 +24,6 @@ dev-image:
     - docker pull $CACHE_REGISTRY/$IMG_NAME:dev || true
     - docker build
       -f $DOCKERFILE
-      --target production
       --cache-from $CACHE_REGISTRY/$IMG_NAME:$CI_COMMIT_REF_NAME
       --cache-from $CACHE_REGISTRY/$IMG_NAME:dev
       --build-arg BUILDKIT_INLINE_CACHE=1
