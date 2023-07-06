@@ -1,4 +1,8 @@
 from pathlib import Path
+from ray.tune.search.hyperopt import HyperOptSearch
+import ray
+from ray import air, tune
+from ray.tune.schedulers import ASHAScheduler
 from torchvision import transforms
 import numpy as np
 from datasets import DatasetDict, load_from_disk
@@ -25,6 +29,9 @@ def preprocess(image):
     tensor = tensor.repeat(3, 1, 1)
     return tensor
 
+def cost(config):
+    z = config["x"]**2 + config["y"]**2    
+    tune.report(mean_accuracy=z)
 
 class Preprocess:
     def __init__(self):
@@ -122,9 +129,30 @@ def train(dataset, **kwargs):
             tokenizer=image_processor,
             compute_metrics=compute_metrics,
             )
-    trainer.train()
+    #trainer.train()
 
-    test_labels = predict(trainer, dataset["test"])
+    #test_labels = predict(trainer, dataset["test"])
+    test_labels = None
+
+    space = {
+        "x": tune.uniform(-10, 10),
+        "y": tune.uniform(-10, 10),
+    }
+
+    search_alg = HyperOptSearch(
+        space, 
+        metric="mean_accuracy", 
+        mode="min"
+    )
+
+    tuner = tune.Tuner(
+        cost,
+        tune_config=tune.TuneConfig(
+            num_samples=1000,
+            search_alg=search_alg
+        )
+    )
+    results = tuner.fit()
     return trainer, test_labels
 
 def write_json(file_name, data):

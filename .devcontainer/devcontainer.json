@@ -7,9 +7,6 @@
 		"context": ".."
 	},
 	"remoteUser": "user",
-	"remoteEnv": {
-		"PATH": "${containerEnv:PATH}:/home/user/.local/bin"
-	},
 	"runArgs": ["--env-file",".devcontainer/devcontainer.env","--gpus","all", "--shm-size=10.24gb"],
 	"postCreateCommand": "bash scripts/install-dev-tools.sh",
 
@@ -24,10 +21,7 @@
 			// Add the IDs of extensions you want installed when the container is created.
 			"extensions": [
 				"ms-python.python",
-				"ms-python.vscode-pylance",
-				"ms-toolsai.jupyter",
-				"ms-python.black-formatter",
-				"iterative.dvc"
+				"ms-python.vscode-pylance"
 			]
 		}
 	}
