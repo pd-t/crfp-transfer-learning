@@ -1,8 +1,6 @@
 from pathlib import Path
-from ray.tune.search.hyperopt import HyperOptSearch
-import ray
-from ray import air, tune
-from ray.tune.schedulers import ASHAScheduler
+from ray import tune
+from ray.tune.schedulers import AsyncHyperBandScheduler
 from torchvision import transforms
 import numpy as np
 from datasets import DatasetDict, load_from_disk
@@ -133,11 +131,56 @@ def train(dataset, **kwargs):
             tokenizer=image_processor,
             compute_metrics=compute_metrics,
             )
- 
-    trainer.train()
+    
+    def ray_hp_space(trial):
+        return {
+            "learning_rate": tune.loguniform(1e-6, 1e-4),
+            "per_device_train_batch_size": tune.choice([16, 32, 64, 128]),
+        }
 
-    test_labels = predict(trainer, dataset["test"])
-    return trainer, test_labels
+    best_result = trainer.hyperparameter_search(
+        direction="maximize",
+        backend="ray",
+        hp_space=ray_hp_space,
+        scheduler=AsyncHyperBandScheduler(metric="objective", mode="max", max_t=2, grace_period=2, reduction_factor=2),
+        resources_per_trial={"cpu": 1, "gpu": 1},
+        n_trials=1,
+        local_dir="./data/train.dir/",
+        name="tune_asha",
+        log_to_file=True
+        )
+    
+    optimized_parameters = best_result.hyperparameters
+
+    optimized_training_args = TrainingArguments(
+            output_dir="./data/tmp.dir/model",
+            remove_unused_columns=False,
+            evaluation_strategy="epoch",
+            save_strategy="epoch",
+        learning_rate=optimized_parameters["learning_rate"],
+        per_device_train_batch_size=optimized_parameters["per_device_train_batch_size"],
+        gradient_accumulation_steps=kwargs["gradient_accumulation_steps"],
+        per_device_eval_batch_size=optimized_parameters["per_device_train_batch_size"],
+        num_train_epochs=kwargs["num_train_epochs"],
+        warmup_ratio=kwargs["warmup_ratio"],
+        logging_steps=kwargs["logging_steps"],
+        load_best_model_at_end=True,
+        metric_for_best_model="accuracy",
+    )
+
+    best_trainer = Trainer(
+            model_init=model_init,
+            args=optimized_training_args,
+            data_collator=data_collator,
+            train_dataset=dataset["train"],
+            eval_dataset=dataset["validate"],
+            tokenizer=image_processor,
+            compute_metrics=compute_metrics,
+            )
+
+    best_trainer.train()
+    test_labels = predict(best_trainer, dataset["test"])
+    return best_trainer, test_labels
 
 def write_json(file_name, data):
     with open(file_name, 'w') as f:
