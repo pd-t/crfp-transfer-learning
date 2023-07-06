@@ -3,6 +3,13 @@ stages:
   - train
   - report
 
+variables:
+    DOCKERFILE: '.devcontainer/Dockerfile'
+    IMG_NAME: 'development'
+    BUILD_CONTEXT: '.'
+    CACHE_REGISTRY: 'developer/jupyter-huggingface-tapelegen'
+    IMAGE_REGISTRY: $CI_REGISTRY_IMAGE
+
 dev-image:
   stage: build
   services:    
@@ -30,8 +37,7 @@ dev-image:
     DOCKER_DRIVER: overlay2
     DOCKER_BUILDKIT: 1
     DOCKER_TLS_CERTDIR: ""
-    CACHE_REGISTRY: developer/jupyter-huggingface-tapelegen
-    IMAGE_REGISTRY: $CI_REGISTRY_IMAGE
+
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: never
