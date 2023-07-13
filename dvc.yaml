@@ -34,6 +34,15 @@ stages:
       - model.loading_steps
       - model.gradient_accumulation_steps
       - model.logging_steps
+      - model.hyperparameters.learning_rate_min
+      - model.hyperparameters.learning_rate_max
+      - model.hyperparameters.batch_sizes
+      - model.asha.max_t
+      - model.asha.grace_period
+      - model.asha.reduction_factor
+      - model.asha.trial_cpus
+      - model.asha.trial_gpus
+      - model.asha.n_trials
     deps:
       - data/prepare.dir
       - src/train.py

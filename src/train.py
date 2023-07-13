@@ -47,7 +47,6 @@ class Preprocess:
         del example_batch["image"]
         return example_batch
     
-    
 accuracy = evaluate.load("accuracy")
 
 def compute_metrics(eval_pred):
@@ -81,96 +80,70 @@ def train_test_split(dataset, **kwargs):
             )
     return dataset
 
+def ray_hp_space(learning_rate_min, learning_rate_max, batch_sizes, trial):
+    return {
+        "learning_rate": tune.loguniform(learning_rate_min, 
+                                         learning_rate_max),
+        "per_device_train_batch_size": tune.choice(batch_sizes),
+    }
+
+def model_init(dataset, checkpoint):
+    labels, label2id, id2label = get_labels(dataset) 
+    model = AutoModelForImageClassification.from_pretrained(
+            checkpoint,
+            num_labels=len(labels),
+            id2label=id2label,
+            label2id=label2id
+            )
+    model.to('cuda')
+    return model
 
 def train(dataset, **kwargs):
     dataset = dataset.with_transform(Preprocess())
-    checkpoint = kwargs["checkpoint"]
-
-    labels = dataset["train"].features["label"].names
-    label2id, id2label = dict(), dict()
-    for i, label in enumerate(labels):
-        label2id[label] = str(i)
-        id2label[str(i)] = label 
-
-    def model_init():
-        model = AutoModelForImageClassification.from_pretrained(
-                checkpoint,
-                num_labels=len(labels),
-                id2label=id2label,
-                label2id=label2id
-                )
-        model.to('cuda')
-        return model
-
-    training_args = TrainingArguments(
-            output_dir="./data/tmp.dir/model",
-            remove_unused_columns=False,
-            evaluation_strategy="epoch",
-            save_strategy="epoch",
-        learning_rate=kwargs["learning_rate"],
-        per_device_train_batch_size=kwargs["batch_size"],
-        gradient_accumulation_steps=kwargs["gradient_accumulation_steps"],
-        per_device_eval_batch_size=kwargs["batch_size"],
-        num_train_epochs=kwargs["num_train_epochs"],
-        warmup_ratio=kwargs["warmup_ratio"],
-        logging_steps=kwargs["logging_steps"],
-        load_best_model_at_end=True,
-        metric_for_best_model="accuracy",
-    )
-    
     data_collator = DefaultDataCollator()
-    image_processor = AutoImageProcessor.from_pretrained(checkpoint)
-
+    image_processor = AutoImageProcessor.from_pretrained(kwargs["checkpoint"])
     
     trainer = Trainer(
-            model_init=model_init,
-            args=training_args,
+            model_init=lambda: model_init(dataset, kwargs["checkpoint"]),
+            args=get_training_args(kwargs),
             data_collator=data_collator,
             train_dataset=dataset["train"],
             eval_dataset=dataset["validate"],
             tokenizer=image_processor,
             compute_metrics=compute_metrics,
             )
-    
-    def ray_hp_space(trial):
-        return {
-            "learning_rate": tune.loguniform(1e-6, 1e-4),
-            "per_device_train_batch_size": tune.choice([16, 32, 64, 128]),
-        }
 
-    best_result = trainer.hyperparameter_search(
+    search_result = trainer.hyperparameter_search(
         direction="maximize",
         backend="ray",
-        hp_space=ray_hp_space,
-        scheduler=AsyncHyperBandScheduler(metric="objective", mode="max", max_t=2, grace_period=2, reduction_factor=2),
-        resources_per_trial={"cpu": 1, "gpu": 1},
-        n_trials=1,
+        hp_space=lambda trial: ray_hp_space(
+            kwargs["hyperparameters"]["learning_rate_min"],
+            kwargs["hyperparameters"]["learning_rate_max"],
+            kwargs["hyperparameters"]["batch_sizes"],
+            trial),
+        scheduler=AsyncHyperBandScheduler(
+            metric="objective", 
+            mode="max", 
+            max_t=kwargs["asha"]["max_t"], 
+            grace_period=kwargs["asha"]["grace_period"], 
+            reduction_factor=kwargs["asha"]["reduction_factor"]
+            ),
+        resources_per_trial={
+            "cpu": kwargs["asha"]["trial_cpus"], 
+            "gpu": kwargs["asha"]["trial_gpus"]
+            },
+        n_trials=kwargs["asha"]["n_trials"],
         local_dir="./data/train.dir/",
         name="tune_asha",
         log_to_file=True
         )
     
-    optimized_parameters = best_result.hyperparameters
-
-    optimized_training_args = TrainingArguments(
-            output_dir="./data/tmp.dir/model",
-            remove_unused_columns=False,
-            evaluation_strategy="epoch",
-            save_strategy="epoch",
-        learning_rate=optimized_parameters["learning_rate"],
-        per_device_train_batch_size=optimized_parameters["per_device_train_batch_size"],
-        gradient_accumulation_steps=kwargs["gradient_accumulation_steps"],
-        per_device_eval_batch_size=optimized_parameters["per_device_train_batch_size"],
-        num_train_epochs=kwargs["num_train_epochs"],
-        warmup_ratio=kwargs["warmup_ratio"],
-        logging_steps=kwargs["logging_steps"],
-        load_best_model_at_end=True,
-        metric_for_best_model="accuracy",
-    )
-
-    best_trainer = Trainer(
-            model_init=model_init,
-            args=optimized_training_args,
+    optimized_parameters = search_result.hyperparameters
+    kwargs["learning_rate"] = optimized_parameters["learning_rate"] 
+    kwargs["batch_size"] = optimized_parameters["per_device_train_batch_size"]
+    optimized_trainer = Trainer(
+            model_init=lambda: model_init(dataset, kwargs["checkpoint"]),
+            args=get_training_args(kwargs),
             data_collator=data_collator,
             train_dataset=dataset["train"],
             eval_dataset=dataset["validate"],
@@ -178,9 +151,36 @@ def train(dataset, **kwargs):
             compute_metrics=compute_metrics,
             )
 
-    best_trainer.train()
-    test_labels = predict(best_trainer, dataset["test"])
-    return best_trainer, test_labels
+    optimized_trainer.train()
+    test_labels = predict(optimized_trainer, dataset["test"])
+    return optimized_trainer, test_labels
+
+def get_labels(dataset):
+    labels = dataset["train"].features["label"].names
+    label2id, id2label = dict(), dict()
+    for i, label in enumerate(labels):
+        label2id[label] = str(i)
+        id2label[str(i)] = label
+    return labels,label2id,id2label
+
+def get_training_args(params):
+    optimized_training_args = TrainingArguments(
+            output_dir="./data/tmp.dir/model",
+            remove_unused_columns=False,
+            evaluation_strategy="epoch",
+            save_strategy="epoch",
+        learning_rate=params["learning_rate"],
+        per_device_train_batch_size=params["batch_size"],
+        gradient_accumulation_steps=params["gradient_accumulation_steps"],
+        per_device_eval_batch_size=params["batch_size"],
+        num_train_epochs=params["num_train_epochs"],
+        warmup_ratio=params["warmup_ratio"],
+        logging_steps=params["logging_steps"],
+        load_best_model_at_end=True,
+        metric_for_best_model="accuracy",
+    )
+    
+    return optimized_training_args
 
 def write_json(file_name, data):
     with open(file_name, 'w') as f:
