@@ -4,8 +4,9 @@ stages:
     cmd: PYTHONPATH="." python3 src/load.py
     deps:
     - path: src/load.py
-      md5: 3c3d38c3c44a3c1b6acd842b2ca25a6b
-      size: 1773
+      hash: md5
+      md5: 98cd61d5de1b035a904502cb1f6ddbd4
+      size: 1781
     params:
       params.yaml:
         data.remote.s3_bucket: data
@@ -16,7 +17,7 @@ stages:
     outs:
     - path: data/load.dir
       hash: md5
-      md5: d7e6db9bac817b763dc4f6d895a8bbe4.dir
+      md5: 603d9e748115da7f090d9cc701ac87ad.dir
       size: 84969093
       nfiles: 10
   prepare:
@@ -24,7 +25,7 @@ stages:
     deps:
     - path: data/load.dir
       hash: md5
-      md5: d7e6db9bac817b763dc4f6d895a8bbe4.dir
+      md5: 603d9e748115da7f090d9cc701ac87ad.dir
       size: 84969093
       nfiles: 10
     - path: src/prepare.py
@@ -33,7 +34,7 @@ stages:
     outs:
     - path: data/prepare.dir
       hash: md5
-      md5: ba8db6fa3888a1c1badc48dda591b7f8.dir
+      md5: ee346c9d29237d3dee12f18cc66bf0a5.dir
       size: 10307635
       nfiles: 7
   train:
@@ -41,18 +42,32 @@ stages:
     deps:
     - path: data/prepare.dir
       hash: md5
-      md5: ba8db6fa3888a1c1badc48dda591b7f8.dir
+      md5: ee346c9d29237d3dee12f18cc66bf0a5.dir
       size: 10307635
       nfiles: 7
     - path: src/train.py
-      md5: f1c62bec554edc216c568ec50e4c6472
-      size: 4740
+      hash: md5
+      md5: 927fe520ee761769a58dd3b4aecea7fc
+      size: 7022
     params:
       params.yaml:
-        model.batch_size: 256
+        model.asha.grace_period: 3
+        model.asha.max_t: 10
+        model.asha.n_trials: 50
+        model.asha.reduction_factor: 2
+        model.asha.trial_cpus: 1
+        model.asha.trial_gpus: 0.5
+        model.batch_size: 128
         model.checkpoint: google/vit-base-patch16-224-in21k
         model.eval-test-size: 0.2
         model.gradient_accumulation_steps: 4
+        model.hyperparameters.batch_sizes:
+        - 16
+        - 32
+        - 64
+        - 128
+        model.hyperparameters.learning_rate_max: 0.0001
+        model.hyperparameters.learning_rate_min: 1e-06
         model.learning_rate: 5e-05
         model.loading_steps: 10
         model.logging_steps: 10
@@ -63,30 +78,30 @@ stages:
     outs:
     - path: data/train.dir
       hash: md5
-      md5: 8378a8569cab1d6d2957e53dba4c05d1.dir
-      size: 9526
-      nfiles: 2
+      md5: 74ae4d21a572a8cc6f5600f2fb24a80d.dir
+      size: 254366847436
+      nfiles: 2330
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
     - path: data/train.dir
       hash: md5
-      md5: 8378a8569cab1d6d2957e53dba4c05d1.dir
-      size: 9526
-      nfiles: 2
+      md5: 74ae4d21a572a8cc6f5600f2fb24a80d.dir
+      size: 254366847436
+      nfiles: 2330
     - path: src/eval.py
       md5: 77b984401b2a3527ccc6e786f03c820b
       size: 1323
     outs:
     - path: accuracy.json
       hash: md5
-      md5: cf79947612c73bbf9ad7d1a3c133fc0c
-      size: 971
+      md5: fc734b9c9769ab0f53a756c9a2a1f182
+      size: 975
     - path: loss.json
       hash: md5
-      md5: 723a23bf18ac0828733b5f9c301d8ce2
-      size: 933
+      md5: aa01280921274d8806e81ca5d28f2a84
+      size: 938
     - path: metrics.json
       hash: md5
-      md5: 26fd4f57479a9e5a2a1c1a48c90d41a3
-      size: 80
+      md5: a619e34f1df2873534d468686b6c316c
+      size: 81
