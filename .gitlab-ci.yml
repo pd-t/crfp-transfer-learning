@@ -5,7 +5,7 @@ stages:
 
 variables:
     DOCKERFILE: '.devcontainer/Dockerfile'
-    IMG_NAME: 'development'
+    IMG_NAME: 'base'
     BUILD_CONTEXT: '.'
     CACHE_REGISTRY: 'developer/jupyter-huggingface-tapelegen'
     IMAGE_REGISTRY: $CI_REGISTRY_IMAGE
@@ -29,6 +29,7 @@ dev-image:
       --build-arg BUILDKIT_INLINE_CACHE=1
       --tag $IMAGE_REGISTRY/$IMG_NAME:$CI_COMMIT_SHA
       --tag $IMAGE_REGISTRY/$IMG_NAME:$CI_COMMIT_REF_NAME
+      --target $IMG_NAME
       $BUILD_CONTEXT
     - docker push $IMAGE_REGISTRY/$IMG_NAME:$CI_COMMIT_SHA
     - docker push $IMAGE_REGISTRY/$IMG_NAME:$CI_COMMIT_REF_NAME
@@ -54,8 +55,8 @@ dvc-repro:
       - .cache
   before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
-    - sudo git config user.email "cml@gitlab.wogra.com"
-    - sudo git config user.name "Gitlab CML"
+    - git config user.email "cml@gitlab.wogra.com"
+    - git config user.name "Gitlab CML"
     - bash create_minio_credentials.sh
     - bash scripts/install-dev-tools.sh
   script:
