@@ -54,10 +54,8 @@ dvc-repro:
       - .cache
   before_script:
     - git config --global --add safe.directory $CI_PROJECT_DIR
-    - ls -al .git
-    - whoami
-    - git config user.email "cml@gitlab.wogra.com"
-    - git config user.name "Gitlab CML"
+    - sudo git config user.email "cml@gitlab.wogra.com"
+    - sudo git config user.name "Gitlab CML"
     - bash create_minio_credentials.sh
     - bash scripts/install-dev-tools.sh
   script:
