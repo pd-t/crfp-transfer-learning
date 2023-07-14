@@ -111,13 +111,18 @@ def get_training_args(
         output_dir="./data/train.dir/model",
         save_strategy="epoch"
         ):
+    if save_strategy == "no":
+        load_best_model_at_end = False
+    else:
+        load_best_model_at_end = True
+    
     training_args = TrainingArguments(
         output_dir=output_dir,
         remove_unused_columns=False,
         evaluation_strategy="epoch",
         save_strategy=save_strategy,
-        save_total_limit=1,
-        load_best_model_at_end=True,
+        save_total_limit=2,
+        load_best_model_at_end=load_best_model_at_end,
         metric_for_best_model="accuracy",
         learning_rate=params["learning_rate"],
         per_device_train_batch_size=params["batch_size"],
@@ -134,7 +139,7 @@ def train(dataset, **kwargs):
     data_collator = DefaultDataCollator()
     image_processor = AutoImageProcessor.from_pretrained(kwargs["checkpoint"])
     
-    trainer = Trainer(
+    search_trainer = Trainer(
             model_init=lambda: model_init(dataset, kwargs["checkpoint"]),
             args=get_training_args(kwargs, save_strategy="no", output_dir="./"),
             data_collator=data_collator,
@@ -144,7 +149,7 @@ def train(dataset, **kwargs):
             compute_metrics=compute_metrics,
             )
 
-    search_result = trainer.hyperparameter_search(
+    search_result = search_trainer.hyperparameter_search(
         direction="maximize",
         backend="ray",
         hp_space=lambda trial: ray_hp_space(
@@ -164,7 +169,7 @@ def train(dataset, **kwargs):
             "gpu": kwargs["asha"]["trial_gpus"]
             },
         n_trials=kwargs["asha"]["n_trials"],
-        local_dir="./data/train.dir/ray",
+        local_dir="./data/train.dir",
         name="tune_asha",
         log_to_file=True
         )

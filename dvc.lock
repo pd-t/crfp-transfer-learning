@@ -17,15 +17,15 @@ stages:
     outs:
     - path: data/load.dir
       hash: md5
-      md5: 08d8772500ad34f5a879787fef4054da.dir
-      size: 84526599
-      nfiles: 10
+      md5: 01bc32df75677aa7312c96cb6d2e4bce.dir
+      size: 84402887
+      nfiles: 3
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
       hash: md5
-      md5: 08d8772500ad34f5a879787fef4054da.dir
+      md5: 2b806b2c55fe2f0091c50191957749a2.dir
       size: 84526599
       nfiles: 10
     - path: src/prepare.py
@@ -34,21 +34,21 @@ stages:
     outs:
     - path: data/prepare.dir
       hash: md5
-      md5: 1f67dceda062d14328092d34150eba52.dir
-      size: 10307635
-      nfiles: 7
+      md5: 7948926cf08a227a7a4cc72e0452724d.dir
+      size: 10299219
+      nfiles: 3
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
     - path: data/prepare.dir
       hash: md5
-      md5: 1f67dceda062d14328092d34150eba52.dir
+      md5: f7eb99316c3e4c82f7c2113fa1d0e378.dir
       size: 10307635
       nfiles: 7
     - path: src/train.py
       hash: md5
-      md5: 93017ddb1b4854d05209d3ff6bd0db23
-      size: 7137
+      md5: 3007ee8e496f23fbe8f679883d95587e
+      size: 7287
     params:
       params.yaml:
         model.asha.grace_period: 3
@@ -78,9 +78,9 @@ stages:
     outs:
     - path: data/train.dir
       hash: md5
-      md5: 7d00ab8843f7cf74e1e98f5a47d9bc79.dir
-      size: 37073683992
-      nfiles: 327
+      md5: 50780a853bd977714a9ce1d0e6655086.dir
+      size: 2059866630
+      nfiles: 56
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
