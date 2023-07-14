@@ -28,4 +28,4 @@ model:
     reduction_factor: 2
     trial_cpus: 1
     trial_gpus: .5
-    n_trials: 50
+    n_trials: 5

@@ -17,16 +17,16 @@ stages:
     outs:
     - path: data/load.dir
       hash: md5
-      md5: 603d9e748115da7f090d9cc701ac87ad.dir
-      size: 84969093
+      md5: 08d8772500ad34f5a879787fef4054da.dir
+      size: 84526599
       nfiles: 10
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
       hash: md5
-      md5: 603d9e748115da7f090d9cc701ac87ad.dir
-      size: 84969093
+      md5: 08d8772500ad34f5a879787fef4054da.dir
+      size: 84526599
       nfiles: 10
     - path: src/prepare.py
       md5: f1bda56fc9db37162b9ef1627ce66076
@@ -34,7 +34,7 @@ stages:
     outs:
     - path: data/prepare.dir
       hash: md5
-      md5: ee346c9d29237d3dee12f18cc66bf0a5.dir
+      md5: 1f67dceda062d14328092d34150eba52.dir
       size: 10307635
       nfiles: 7
   train:
@@ -42,18 +42,18 @@ stages:
     deps:
     - path: data/prepare.dir
       hash: md5
-      md5: ee346c9d29237d3dee12f18cc66bf0a5.dir
+      md5: 1f67dceda062d14328092d34150eba52.dir
       size: 10307635
       nfiles: 7
     - path: src/train.py
       hash: md5
-      md5: 927fe520ee761769a58dd3b4aecea7fc
-      size: 7022
+      md5: 93017ddb1b4854d05209d3ff6bd0db23
+      size: 7137
     params:
       params.yaml:
         model.asha.grace_period: 3
         model.asha.max_t: 10
-        model.asha.n_trials: 50
+        model.asha.n_trials: 5
         model.asha.reduction_factor: 2
         model.asha.trial_cpus: 1
         model.asha.trial_gpus: 0.5
@@ -78,30 +78,30 @@ stages:
     outs:
     - path: data/train.dir
       hash: md5
-      md5: 74ae4d21a572a8cc6f5600f2fb24a80d.dir
-      size: 254366847436
-      nfiles: 2330
+      md5: 7d00ab8843f7cf74e1e98f5a47d9bc79.dir
+      size: 37073683992
+      nfiles: 327
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
     - path: data/train.dir
       hash: md5
-      md5: 74ae4d21a572a8cc6f5600f2fb24a80d.dir
-      size: 254366847436
-      nfiles: 2330
+      md5: 7d00ab8843f7cf74e1e98f5a47d9bc79.dir
+      size: 37073683992
+      nfiles: 327
     - path: src/eval.py
       md5: 77b984401b2a3527ccc6e786f03c820b
       size: 1323
     outs:
     - path: accuracy.json
       hash: md5
-      md5: fc734b9c9769ab0f53a756c9a2a1f182
-      size: 975
+      md5: 4be7d31ec2cde52bbf9389cd0d6b6c5e
+      size: 970
     - path: loss.json
       hash: md5
-      md5: aa01280921274d8806e81ca5d28f2a84
-      size: 938
+      md5: f8f0746552998458c56c6e2ba9f9cbdc
+      size: 935
     - path: metrics.json
       hash: md5
-      md5: a619e34f1df2873534d468686b6c316c
+      md5: d379b637ad8b23ebb877878060219f4c
       size: 81

@@ -98,6 +98,37 @@ def model_init(dataset, checkpoint):
     model.to('cuda')
     return model
 
+def get_labels(dataset):
+    labels = dataset["train"].features["label"].names
+    label2id, id2label = dict(), dict()
+    for i, label in enumerate(labels):
+        label2id[label] = str(i)
+        id2label[str(i)] = label
+    return labels,label2id,id2label
+
+def get_training_args(
+        params, 
+        output_dir="./data/train.dir/model",
+        save_strategy="epoch"
+        ):
+    training_args = TrainingArguments(
+        output_dir=output_dir,
+        remove_unused_columns=False,
+        evaluation_strategy="epoch",
+        save_strategy=save_strategy,
+        save_total_limit=1,
+        load_best_model_at_end=True,
+        metric_for_best_model="accuracy",
+        learning_rate=params["learning_rate"],
+        per_device_train_batch_size=params["batch_size"],
+        gradient_accumulation_steps=params["gradient_accumulation_steps"],
+        per_device_eval_batch_size=params["batch_size"],
+        num_train_epochs=params["num_train_epochs"],
+        warmup_ratio=params["warmup_ratio"],
+        logging_steps=params["logging_steps"]
+    )
+    return training_args
+
 def train(dataset, **kwargs):
     dataset = dataset.with_transform(Preprocess())
     data_collator = DefaultDataCollator()
@@ -105,7 +136,7 @@ def train(dataset, **kwargs):
     
     trainer = Trainer(
             model_init=lambda: model_init(dataset, kwargs["checkpoint"]),
-            args=get_training_args(kwargs),
+            args=get_training_args(kwargs, save_strategy="no", output_dir="./"),
             data_collator=data_collator,
             train_dataset=dataset["train"],
             eval_dataset=dataset["validate"],
@@ -133,7 +164,7 @@ def train(dataset, **kwargs):
             "gpu": kwargs["asha"]["trial_gpus"]
             },
         n_trials=kwargs["asha"]["n_trials"],
-        local_dir="./data/train.dir/",
+        local_dir="./data/train.dir/ray",
         name="tune_asha",
         log_to_file=True
         )
@@ -154,33 +185,6 @@ def train(dataset, **kwargs):
     optimized_trainer.train()
     test_labels = predict(optimized_trainer, dataset["test"])
     return optimized_trainer, test_labels
-
-def get_labels(dataset):
-    labels = dataset["train"].features["label"].names
-    label2id, id2label = dict(), dict()
-    for i, label in enumerate(labels):
-        label2id[label] = str(i)
-        id2label[str(i)] = label
-    return labels,label2id,id2label
-
-def get_training_args(params):
-    optimized_training_args = TrainingArguments(
-            output_dir="./data/tmp.dir/model",
-            remove_unused_columns=False,
-            evaluation_strategy="epoch",
-            save_strategy="epoch",
-        learning_rate=params["learning_rate"],
-        per_device_train_batch_size=params["batch_size"],
-        gradient_accumulation_steps=params["gradient_accumulation_steps"],
-        per_device_eval_batch_size=params["batch_size"],
-        num_train_epochs=params["num_train_epochs"],
-        warmup_ratio=params["warmup_ratio"],
-        logging_steps=params["logging_steps"],
-        load_best_model_at_end=True,
-        metric_for_best_model="accuracy",
-    )
-    
-    return optimized_training_args
 
 def write_json(file_name, data):
     with open(file_name, 'w') as f:
