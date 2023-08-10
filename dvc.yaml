@@ -5,8 +5,8 @@ stages:
       - data.remote.s3_endpoint_url
       - data.remote.s3_bucket
       - data.remote.s3_path
-      - data.seed
       - data.select
+      - data.seed
     deps:
       - src/load.py
     outs:
@@ -14,6 +14,10 @@ stages:
 
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
+    params:
+      - data.development-size
+      - data.development-train-size
+      - data.seed
     deps:
       - data/load.dir
       - src/prepare.py

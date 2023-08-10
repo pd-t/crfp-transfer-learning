@@ -3,7 +3,7 @@ from ray import tune
 from ray.tune.schedulers import AsyncHyperBandScheduler
 from torchvision import transforms
 import numpy as np
-from datasets import DatasetDict, load_from_disk
+import datasets
 import evaluate
 from pathlib import Path
 from transformers import (
@@ -61,24 +61,6 @@ def predict(trainer, dataset):
     id2label = dataset.features["label"].names
     result = {"labels": [{"actual_label": id2label[a], "predicted_label": id2label[p]} for a, p in zip(prediction.label_ids, predicted_labels)]}
     return result
-
-def train_test_split(dataset, **kwargs):
-    split_one = dataset.train_test_split(
-        test_size=kwargs["eval-test-size"], 
-        seed=kwargs["seed"]
-    )
-    split_two = split_one["test"].train_test_split(
-        test_size=kwargs["test-size"], 
-        seed=kwargs["seed"]
-    )
-    dataset = DatasetDict(
-            {
-                "train": split_one["train"],
-                "validate": split_two["train"],
-                "test": split_two["test"],
-                }
-            )
-    return dataset
 
 def ray_hp_space(learning_rate_min, learning_rate_max, batch_sizes, trial):
     return {
@@ -201,10 +183,9 @@ if __name__ == '__main__':
 
     params = dvc.api.params_show(stages=['train'])
 
-    prepared_dataset = load_from_disk("data/prepare.dir/dataset")
-    splitted_dataset = train_test_split(prepared_dataset, **params['model'])
+    prepared_dataset = datasets.DatasetDict.load_from_disk("data/prepare.dir/dataset")
 
-    trained_trainer, tested_labels = train(splitted_dataset, **params['model'])
+    trained_trainer, tested_labels = train(prepared_dataset, **params['model'])
 
     trainer_log = {"trainer": trained_trainer.state.log_history}
     write_json('data/train.dir/trainer_log.json', trainer_log)
