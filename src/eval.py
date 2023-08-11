@@ -1,13 +1,5 @@
 from copy import copy
-import json
-
-def write_json(file_name, data):
-    with open(file_name, 'w') as f:
-        json.dump(data, f, indent=4)
-
-def load_json(file_name):
-    with open(file_name, 'r') as f:
-        return json.load(f)
+from helpers.helpers import load_json, write_json
 
 def extract_values_from_log(trainer_log, key):
     return [item[key] for item in trainer_log["trainer"] if key in item.keys()]
@@ -34,6 +26,3 @@ if __name__=='__main__':
     evaluate(trainer_log)
     # save tested labels
     write_json("labels.json", tested_labels)
-
-
-

@@ -3,7 +3,7 @@ data:
     s3_endpoint_url: 'https://storage.s3.mlops.wogra.com'
     s3_bucket: 'data'
     s3_path: 'dlr/Tapelegedaten2023.zip'
-  select: 6666
+  select: 'Complete'
   development-size: 0.67
   development-train-size: 0.9
   seed: 42

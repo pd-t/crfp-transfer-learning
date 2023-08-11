@@ -23,6 +23,8 @@ stages:
       - src/prepare.py
     outs:
       - data/prepare.dir
+    metrics:
+      - data.json
 
   train:
     cmd: PYTHONPATH="." python src/train.py

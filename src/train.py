@@ -14,7 +14,7 @@ from transformers import (
     TrainingArguments,
 )
 import dvc.api
-import json
+from helpers.helpers import write_json
 
 def preprocess(image):
     # convert image to tensor
@@ -173,9 +173,6 @@ def train(dataset, **kwargs):
     test_labels = predict(optimized_trainer, dataset["test"])
     return optimized_trainer, test_labels
 
-def write_json(file_name, data):
-    with open(file_name, 'w') as f:
-        json.dump(data, f, indent=4)
 
 if __name__ == '__main__':
     Path('data/tmp.dir').mkdir(parents=True, exist_ok=True)
