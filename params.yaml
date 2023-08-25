@@ -11,23 +11,33 @@ data:
 model:
   checkpoint: 'google/vit-base-patch16-224-in21k'
   image_size: [224, 224]
-  batch_size: 128
+
+trainer:
+  learning_rate: 1e-5
+  per_device_train_batch_size: 128
+  per_device_eval_batch_size: 128
   num_train_epochs: 10
-  learning_rate: 5e-5
   warmup_ratio: 0.1
-  loading_steps: 10
   gradient_accumulation_steps: 4
+  loading_steps: 10
   logging_steps: 10
-  hyperparameters:
-    learning_rate_min: 1e-6
-    learning_rate_max: 1e-4
-    batch_sizes: [16, 32, 64, 128]
-  asha:
-    max_t: 10
-    grace_period: 3
-    reduction_factor: 2
-    trial_cpus: 1
-    trial_gpus: .5
-    n_trials: 5
-  dataset_sizes: [3000, 2000, 1000, 600, 300, 100, 60, 30]
-  seed: 42
+
+hyperparameters:
+  data:
+    seed: 42
+    labels_per_category: 300
+  learning_rates: [1e-6, 1e-4]
+  batch_sizes: [16, 32, 64, 128]
+
+asha:
+  max_t: 10
+  grace_period: 3
+  reduction_factor: 2
+  trial_cpus: 1
+  trial_gpus: .5
+  n_trials: 6
+
+evaluate:
+  data:
+    seed: 42
+    sizes: [2800, 1800, 1200, 800, 500, 250, 100]

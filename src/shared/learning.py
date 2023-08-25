@@ -38,7 +38,12 @@ class Preprocess:
         return example_batch
     
 class ModelMaker:
-    def __init__(self, checkpoints: str) -> None:
+    def __init__(
+            self, 
+            checkpoints: str,
+            output_dir: str
+            ) -> None:
+        self.output_dir=output_dir 
         self.checkpoint=checkpoints
 
     @staticmethod
@@ -71,7 +76,6 @@ class ModelMaker:
 
     def __get_trainer_args(self,
             trainer_args: dict,
-            output_dir="./data/train.dir/model",
             save_strategy="epoch"
             ):
         if save_strategy == "no":
@@ -80,7 +84,7 @@ class ModelMaker:
             load_best_model_at_end = True
         
         training_args = TrainingArguments(
-            output_dir=output_dir,
+            output_dir=self.output_dir,
             remove_unused_columns=False,
             evaluation_strategy="epoch",
             save_strategy=save_strategy,
@@ -101,15 +105,14 @@ class ModelMaker:
             self, 
             dataset: DatasetDict, 
             trainer_args: dict,
-            save_strategy="no", 
-            output_dir="./"
+            save_strategy="no"
         ):
         dataset = dataset.with_transform(Preprocess())
         data_collator = DefaultDataCollator()
         image_processor = AutoImageProcessor.from_pretrained(self.checkpoint)
         trainer = Trainer(
                 model_init=lambda: self.__get_model(dataset),
-                args=self.__get_trainer_args(trainer_args, save_strategy=save_strategy, output_dir=output_dir),
+                args=self.__get_trainer_args(trainer_args, save_strategy=save_strategy),
                 data_collator=data_collator,
                 train_dataset=dataset["train"],
                 eval_dataset=dataset["validate"],

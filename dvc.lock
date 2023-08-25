@@ -5,38 +5,56 @@ stages:
     deps:
     - path: src/load.py
       hash: md5
-      md5: 98cd61d5de1b035a904502cb1f6ddbd4
-      size: 1781
+      md5: 5058b4d14cb22b1fe1cb148f6c7e9113
+      size: 1824
     params:
       params.yaml:
         data.remote.s3_bucket: data
         data.remote.s3_endpoint_url: https://storage.s3.mlops.wogra.com
         data.remote.s3_path: dlr/Tapelegedaten2023.zip
         data.seed: 42
-        data.select: 5000
+        data.select: Complete
     outs:
     - path: data/load.dir
       hash: md5
-      md5: 2b806b2c55fe2f0091c50191957749a2.dir
-      size: 84526599
-      nfiles: 10
+      md5: ca839712a209e9fba6f8bd634a990aab.dir
+      size: 1072939781
+      nfiles: 16
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
       hash: md5
-      md5: 2b806b2c55fe2f0091c50191957749a2.dir
-      size: 84526599
-      nfiles: 10
+      md5: ca839712a209e9fba6f8bd634a990aab.dir
+      size: 1072939781
+      nfiles: 16
     - path: src/prepare.py
-      md5: f1bda56fc9db37162b9ef1627ce66076
-      size: 1157
+      hash: md5
+      md5: 9e97b3bf12c715fc40d4cc953b80b94a
+      size: 1702
+    - path: src/shared/data.py
+      hash: md5
+      md5: 6d8dd068993db33ee6256893d32cc32f
+      size: 1084
+    - path: src/shared/helpers.py
+      hash: md5
+      md5: 48e563e980be7bd4ff8e91b6af67e395
+      size: 210
+    params:
+      params.yaml:
+        data.development-size: 0.67
+        data.development-train-size: 0.9
+        data.seed: 42
     outs:
+    - path: data.json
+      hash: md5
+      md5: 1d852fe3c7eea44f3f25614ba21bbd39
+      size: 85
     - path: data/prepare.dir
       hash: md5
-      md5: f7eb99316c3e4c82f7c2113fa1d0e378.dir
-      size: 10307635
-      nfiles: 7
+      md5: ba41ad2bcd86d901cb6b6e58a6efa499.dir
+      size: 451724138
+      nfiles: 17
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
@@ -84,14 +102,15 @@ stages:
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
-    - path: data/train.dir
+    - path: data/search.dir
       hash: md5
-      md5: f41d8a10ab6ef4b75e4f30c1d81eaedb.dir
-      size: 2059841129
-      nfiles: 56
+      md5: 5d8f36b427ecbff26cf5121d3a4c3395.dir
+      size: 297599
+      nfiles: 45
     - path: src/eval.py
-      md5: 77b984401b2a3527ccc6e786f03c820b
-      size: 1323
+      hash: md5
+      md5: 985f1f91a8660f31dc86bf75937ab6fe
+      size: 3087
     outs:
     - path: accuracy.json
       hash: md5
@@ -99,9 +118,66 @@ stages:
       size: 970
     - path: loss.json
       hash: md5
-      md5: 6663f73e9d86133aa76633bb2c1d638a
+      md5: eb6dc966007703a9f6aa949b22acffc2
       size: 936
     - path: metrics.json
       hash: md5
-      md5: 72938b6fc09a5941ef5e02b5baa05054
+      md5: d379b637ad8b23ebb877878060219f4c
       size: 81
+  search:
+    cmd: PYTHONPATH="." python src/search.py
+    deps:
+    - path: data/prepare.dir
+      hash: md5
+      md5: ba41ad2bcd86d901cb6b6e58a6efa499.dir
+      size: 451724138
+      nfiles: 17
+    - path: src/search.py
+      hash: md5
+      md5: 1c2cee3322c410bc0fbad44e5c26d57f
+      size: 2524
+    - path: src/shared/data.py
+      hash: md5
+      md5: 6d8dd068993db33ee6256893d32cc32f
+      size: 1084
+    - path: src/shared/helpers.py
+      hash: md5
+      md5: 48e563e980be7bd4ff8e91b6af67e395
+      size: 210
+    - path: src/shared/learning.py
+      hash: md5
+      md5: fdf6b097a2235d7007c791f9f2d0c124
+      size: 4174
+    params:
+      params.yaml:
+        asha.grace_period: 3
+        asha.max_t: 10
+        asha.n_trials: 6
+        asha.reduction_factor: 2
+        asha.trial_cpus: 1
+        asha.trial_gpus: 0.5
+        hyperparameters.batch_sizes:
+        - 16
+        - 32
+        - 64
+        - 128
+        hyperparameters.data.labels_per_category: 300
+        hyperparameters.data.seed: 42
+        hyperparameters.learning_rates:
+        - 1e-06
+        - 0.0001
+        model.checkpoint: google/vit-base-patch16-224-in21k
+        trainer.gradient_accumulation_steps: 4
+        trainer.learning_rate: 1e-05
+        trainer.loading_steps: 10
+        trainer.logging_steps: 10
+        trainer.num_train_epochs: 10
+        trainer.per_device_eval_batch_size: 128
+        trainer.per_device_train_batch_size: 128
+        trainer.warmup_ratio: 0.1
+    outs:
+    - path: data/search.dir
+      hash: md5
+      md5: 5d8f36b427ecbff26cf5121d3a4c3395.dir
+      size: 297599
+      nfiles: 45

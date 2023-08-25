@@ -1,8 +1,9 @@
-import numpy as np
 import dvc.api
-from datasets import concatenate_datasets, DatasetDict, Dataset, load_from_disk
+from datasets import DatasetDict, Dataset, load_from_disk
 from pathlib import Path
-from helpers.helpers import write_json
+from shared.helpers import write_json
+from shared.data import balance
+
 
 def train_test_split(dataset, **kwargs):
     dev_test_split = dataset.train_test_split(
@@ -22,29 +23,6 @@ def train_test_split(dataset, **kwargs):
     )
     return dataset
 
-def balance(dataset: Dataset) -> Dataset:
-    dataset = dataset.filter(lambda example: np.mean(example["image"]) != 0)
-
-    labels = dataset.features["label"].names
-    label2id, id2label = dict(), dict()
-
-    for i, label in enumerate(labels):
-        label2id[label] = str(i)
-        id2label[str(i)] = label
-    labelids = [int(id) for id in id2label.keys()]
-
-    sorted_datasets = [
-            dataset.filter(lambda example: example["label"] == labelid, batch_size=1024)
-            for labelid in labelids
-            ]
-    
-    min_examples = min(data.num_rows for data in sorted_datasets)
-    
-    weighted_dataset = concatenate_datasets(
-            [fd.shuffle(seed=42).select(range(min_examples)) for fd in sorted_datasets]
-            )
-
-    return weighted_dataset
 
 def save_data_metrics(loaded_dataset: Dataset, prepared_dataset: Dataset):
     data_metrics = {

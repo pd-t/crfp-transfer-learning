@@ -22,7 +22,6 @@ def ray_hp_space(
 
 
 def search(dataset, **kwargs):
-
     labels_per_category = kwargs["hyperparameters"]["data"]["labels_per_category"]
 
     search_training_dataset = balance(
@@ -31,7 +30,9 @@ def search(dataset, **kwargs):
     )
     dataset["train"] = search_training_dataset
 
-    model_maker = ModelMaker(kwargs["model"]["checkpoint"])
+    model_maker = ModelMaker(
+        checkpoints=kwargs["model"]["checkpoint"],
+        output_dir="./data/tmp.dir/model")
     trainer = model_maker.get_trainer(dataset, trainer_args=kwargs["trainer"])
     hyperparameter_search = trainer.hyperparameter_search(
         direction="maximize",
@@ -53,7 +54,7 @@ def search(dataset, **kwargs):
             "gpu": kwargs["asha"]["trial_gpus"]
             },
         n_trials=kwargs["asha"]["n_trials"],
-        local_dir="./data/train.dir",
+        local_dir="./data/search.dir",
         name="tune_asha",
         log_to_file=True
     )
@@ -62,15 +63,15 @@ def search(dataset, **kwargs):
 
 if __name__ == '__main__':
     Path('data/tmp.dir').mkdir(parents=True, exist_ok=True)
-    Path('data/train.dir').mkdir(parents=True, exist_ok=True)
+    Path('data/search.dir').mkdir(parents=True, exist_ok=True)
 
-    params = dvc.api.params_show(stages=['search-hyperparameters'])
+    params = dvc.api.params_show(stages=['search'])
 
     prepared_dataset = datasets.DatasetDict.load_from_disk("data/prepare.dir/dataset")
 
     searched_hyperparameters = search(prepared_dataset, **params)
 
     write_json(
-        "data/train.dir/hyperparameters.json", 
+        "data/search.dir/hyperparameters.json", 
         searched_hyperparameters
     )

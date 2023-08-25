@@ -20,45 +20,49 @@ stages:
       - data.seed
     deps:
       - data/load.dir
+      - src/shared/data.py
+      - src/shared/helpers.py
       - src/prepare.py
     outs:
       - data/prepare.dir
     metrics:
       - data.json
 
-  train:
-    cmd: PYTHONPATH="." python src/train.py
+  search:
+    cmd: PYTHONPATH="." python src/search.py
     params:
       - model.checkpoint
-      - model.eval-test-size
-      - model.test-size
-      - model.seed
-      - model.batch_size
-      - model.num_train_epochs
-      - model.learning_rate
-      - model.warmup_ratio
-      - model.loading_steps
-      - model.gradient_accumulation_steps
-      - model.logging_steps
-      - model.hyperparameters.learning_rate_min
-      - model.hyperparameters.learning_rate_max
-      - model.hyperparameters.batch_sizes
-      - model.asha.max_t
-      - model.asha.grace_period
-      - model.asha.reduction_factor
-      - model.asha.trial_cpus
-      - model.asha.trial_gpus
-      - model.asha.n_trials
+      - trainer.learning_rate
+      - trainer.per_device_train_batch_size
+      - trainer.per_device_eval_batch_size
+      - trainer.num_train_epochs
+      - trainer.warmup_ratio
+      - trainer.gradient_accumulation_steps
+      - trainer.loading_steps
+      - trainer.logging_steps
+      - hyperparameters.data.seed
+      - hyperparameters.data.labels_per_category
+      - hyperparameters.learning_rates
+      - hyperparameters.batch_sizes
+      - asha.max_t
+      - asha.grace_period
+      - asha.reduction_factor
+      - asha.trial_cpus
+      - asha.trial_gpus
+      - asha.n_trials
     deps:
       - data/prepare.dir
-      - src/train.py
+      - src/shared/data.py
+      - src/shared/helpers.py
+      - src/shared/learning.py
+      - src/search.py
     outs:
-      - data/train.dir
+      - data/search.dir
 
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
-      - data/train.dir
+      - data/search.dir
       - src/eval.py
     plots:
       - accuracy.json
