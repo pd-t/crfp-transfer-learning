@@ -59,34 +59,25 @@ stages:
     outs:
       - data/search.dir
 
-  evaluate:
-    cmd: PYTHONPATH="." python src/eval.py
+  train:
+    cmd: PYTHONPATH="." python src/train.py
+    params:
+      - model.checkpoint
+      - trainer.learning_rate
+      - trainer.per_device_train_batch_size
+      - trainer.per_device_eval_batch_size
+      - trainer.num_train_epochs
+      - trainer.warmup_ratio
+      - trainer.gradient_accumulation_steps
+      - trainer.loading_steps
+      - trainer.logging_steps
+      - data.seed
+      - data.limits
     deps:
       - data/search.dir
-      - src/eval.py
+      - src/train.py
     plots:
       - accuracy.json
       - loss.json
     metrics:
       - metrics.json
-
-plots:
-  - ConfusionMatrix:
-          x: 
-            data/train.dir/tested_labels.json: actual_label
-          y: 
-            data/train.dir/tested_labels.json: predicted_label
-          title: Confusion Matrix for Test Data
-          template: confusion
-          x_label: Actual label
-          y_label: Predicted label
-  - ConfusionMatrixNormalized:
-          x: 
-            data/train.dir/tested_labels.json: actual_label
-          y: 
-            data/train.dir/tested_labels.json: predicted_label
-          title: Confusion Matrix for Test Data (Normalized)
-          template: confusion_normalized
-          x_label: Actual label
-          y_label: Predicted label
-

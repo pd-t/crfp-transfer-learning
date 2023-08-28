@@ -7,6 +7,7 @@ data:
   development-size: 0.67
   development-train-size: 0.9
   seed: 42
+  limits: [100]
 
 model:
   checkpoint: 'google/vit-base-patch16-224-in21k'
@@ -36,8 +37,3 @@ asha:
   trial_cpus: 1
   trial_gpus: .5
   n_trials: 6
-
-evaluate:
-  data:
-    seed: 42
-    sizes: [2800, 1800, 1200, 800, 500, 250, 100]
