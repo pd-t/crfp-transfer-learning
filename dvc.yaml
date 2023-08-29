@@ -75,9 +75,8 @@ stages:
       - data.limits
     deps:
       - data/search.dir
+      - src/shared/helpers.py
+      - src/shared/learning.py
       - src/train.py
-    plots:
-      - accuracy.json
-      - loss.json
     metrics:
       - metrics.json

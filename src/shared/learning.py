@@ -6,7 +6,7 @@ from transformers import (
     AutoModelForImageClassification,
     DefaultDataCollator,
     Trainer,
-    TrainingArguments,
+    TrainingArguments
 )
 from datasets import DatasetDict
 
@@ -73,6 +73,10 @@ class ModelMaker:
         predictions = np.argmax(predictions, axis=1)
         metrics = accuracy.compute(predictions=predictions, references=labels)
         return metrics
+    
+    def predict(self, trainer, dataset):
+        dataset = dataset.with_transform(Preprocess())
+        return trainer.predict(dataset)
 
     def __get_trainer_args(self,
             trainer_args: dict,
@@ -97,7 +101,7 @@ class ModelMaker:
             per_device_eval_batch_size=trainer_args["per_device_eval_batch_size"],
             num_train_epochs=trainer_args["num_train_epochs"],
             warmup_ratio=trainer_args["warmup_ratio"],
-            logging_steps=trainer_args["logging_steps"]
+            logging_steps=trainer_args["logging_steps"],
         )
         return training_args
 
@@ -105,11 +109,12 @@ class ModelMaker:
             self, 
             dataset: DatasetDict, 
             trainer_args: dict,
-            save_strategy="no"
+            save_strategy: str = "no"
         ):
         dataset = dataset.with_transform(Preprocess())
         data_collator = DefaultDataCollator()
         image_processor = AutoImageProcessor.from_pretrained(self.checkpoint)
+        
         trainer = Trainer(
                 model_init=lambda: self.__get_model(dataset),
                 args=self.__get_trainer_args(trainer_args, save_strategy=save_strategy),
@@ -117,6 +122,6 @@ class ModelMaker:
                 train_dataset=dataset["train"],
                 eval_dataset=dataset["validate"],
                 tokenizer=image_processor,
-                compute_metrics=self.__compute_metrics,
+                compute_metrics=self.__compute_metrics
                 )
         return trainer
