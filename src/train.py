@@ -40,7 +40,7 @@ def select_training_data(dataset, limit, seed):
 
 def train(dataset: datasets.DatasetDict, hyperparameters: dict, **kwargs):
     kwargs["learning_rate"] = hyperparameters["learning_rate"] 
-    kwargs["batch_size"] = hyperparameters["per_device_train_batch_size"]
+    kwargs["per_device_train_batch_size"] = hyperparameters["per_device_train_batch_size"]
     
     id2label = dataset["test"].features["label"].names
     labels = {str(i): label for i, label in enumerate(id2label)}
@@ -51,8 +51,8 @@ def train(dataset: datasets.DatasetDict, hyperparameters: dict, **kwargs):
 
     metrics = {}
     metrics.update({"model": kwargs["model"]["checkpoint"]})
-    metrics.update({"learning_rate": hyperparameters["learning_rate"]})
-    metrics.update({"batch_size": hyperparameters["per_device_train_batch_size"]})
+    metrics.update({"learning_rate": kwargs["learning_rate"]})
+    metrics.update({"batch_size": kwargs["per_device_train_batch_size"]})
     metrics.update({"labels": labels})
     metrics.update({"labels_per_category": []})
 
