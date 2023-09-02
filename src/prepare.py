@@ -24,12 +24,12 @@ def train_test_split(dataset, **kwargs):
     return dataset
 
 
-def save_data_metrics(loaded_dataset: Dataset, prepared_dataset: Dataset):
+def save_data_metrics(dataset: Dataset, labels_per_category: int):
     data_metrics = {
-            split: prepared_dataset[split].num_rows 
-            for split in prepared_dataset.keys()
+            split: dataset[split].num_rows 
+            for split in dataset.keys()
             }
-    data_metrics["original"] = loaded_dataset.num_rows
+    data_metrics["labels_per_category"] = labels_per_category
     write_json("data.json", data_metrics)
 
 def prepare(dataset: Dataset, **kwargs) -> Dataset:
@@ -37,7 +37,8 @@ def prepare(dataset: Dataset, **kwargs) -> Dataset:
         dataset, 
         **params['data']
     )
-    balanced_train_dataset = balance(splitted_dataset["train"])
+    balanced_train_dataset, labels_per_category = balance(splitted_dataset["train"])
+    save_data_metrics(splitted_dataset, labels_per_category)
     splitted_dataset["train"] = balanced_train_dataset
     return splitted_dataset
 
@@ -48,5 +49,4 @@ if __name__ == '__main__':
 
     loaded_dataset = load_from_disk("data/load.dir/dataset")
     prepared_dataset = prepare(loaded_dataset, **params['data'])
-    save_data_metrics(loaded_dataset, prepared_dataset)
     prepared_dataset.save_to_disk('data/prepare.dir/dataset')

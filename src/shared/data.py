@@ -1,7 +1,11 @@
 import numpy as np 
 from datasets import concatenate_datasets, Dataset
 
-def balance(dataset: Dataset, labels_per_category=None, seed=42) -> Dataset:
+def balance(
+        dataset: Dataset, 
+        labels_per_category=None, 
+        seed=42
+        ) -> Dataset:
     dataset = dataset.filter(lambda example: np.mean(example["image"]) != 0)
 
     labels = dataset.features["label"].names
@@ -22,9 +26,10 @@ def balance(dataset: Dataset, labels_per_category=None, seed=42) -> Dataset:
     if labels_per_category is not None:
         max_labels_per_category = min(max_labels_per_category, 
                                               labels_per_category)
+        
     
     balanced_dataset = concatenate_datasets(
             [fd.shuffle(seed=seed).select(range(max_labels_per_category)) for fd in sorted_datasets]
             )
 
-    return balanced_dataset
+    return balanced_dataset, max_labels_per_category

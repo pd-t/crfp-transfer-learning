@@ -40,8 +40,8 @@ stages:
       - trainer.gradient_accumulation_steps
       - trainer.loading_steps
       - trainer.logging_steps
-      - hyperparameters.data.seed
-      - hyperparameters.data.labels_per_category
+      - data.seed
+      - hyperparameters.labels_per_category
       - hyperparameters.learning_rates
       - hyperparameters.batch_sizes
       - asha.max_t
@@ -62,7 +62,9 @@ stages:
   train:
     cmd: PYTHONPATH="." python src/train.py
     params:
+      - data.seed
       - model.checkpoint
+      - model.labels_per_category
       - trainer.learning_rate
       - trainer.per_device_train_batch_size
       - trainer.per_device_eval_batch_size
@@ -71,12 +73,10 @@ stages:
       - trainer.gradient_accumulation_steps
       - trainer.loading_steps
       - trainer.logging_steps
-      - data.seed
-      - data.limits
     deps:
       - data/search.dir
       - src/shared/helpers.py
       - src/shared/learning.py
       - src/train.py
     metrics:
-      - metrics.json
+      - models.json

@@ -41,9 +41,7 @@ class ModelMaker:
     def __init__(
             self, 
             checkpoints: str,
-            output_dir: str
             ) -> None:
-        self.output_dir=output_dir 
         self.checkpoint=checkpoints
 
     @staticmethod
@@ -80,15 +78,18 @@ class ModelMaker:
 
     def __get_trainer_args(self,
             trainer_args: dict,
-            save_strategy="epoch"
+            save_best_model: bool,
+            output_dir: str
             ):
-        if save_strategy == "no":
+        if save_best_model == "no":
+            save_strategy == "no"
             load_best_model_at_end = False
         else:
+            save_strategy="epoch"
             load_best_model_at_end = True
         
         training_args = TrainingArguments(
-            output_dir=self.output_dir,
+            output_dir=output_dir,
             remove_unused_columns=False,
             evaluation_strategy="epoch",
             save_strategy=save_strategy,
@@ -107,9 +108,10 @@ class ModelMaker:
 
     def get_trainer(
             self, 
-            dataset: DatasetDict, 
-            trainer_args: dict,
-            save_strategy: str = "no"
+            dataset: DatasetDict,
+            output_dir: str,
+            save_best_model: bool,
+            trainer_args: dict
         ):
         dataset = dataset.with_transform(Preprocess())
         data_collator = DefaultDataCollator()
@@ -117,7 +119,11 @@ class ModelMaker:
         
         trainer = Trainer(
                 model_init=lambda: self.__get_model(dataset),
-                args=self.__get_trainer_args(trainer_args, save_strategy=save_strategy),
+                args=self.__get_trainer_args(
+                    trainer_args, 
+                    save_best_model=save_best_model, 
+                    output_dir=output_dir
+                    ),
                 data_collator=data_collator,
                 train_dataset=dataset["train"],
                 eval_dataset=dataset["validate"],
