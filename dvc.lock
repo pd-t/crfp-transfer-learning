@@ -30,12 +30,12 @@ stages:
       nfiles: 16
     - path: src/prepare.py
       hash: md5
-      md5: 9e97b3bf12c715fc40d4cc953b80b94a
-      size: 1702
+      md5: 9f2c0de893db9cae7aee30e71d892b25
+      size: 1709
     - path: src/shared/data.py
       hash: md5
-      md5: 6d8dd068993db33ee6256893d32cc32f
-      size: 1084
+      md5: dbc74e7d866940984e936c0122c5031e
+      size: 1154
     - path: src/shared/helpers.py
       hash: md5
       md5: 48e563e980be7bd4ff8e91b6af67e395
@@ -48,57 +48,57 @@ stages:
     outs:
     - path: data.json
       hash: md5
-      md5: 1d852fe3c7eea44f3f25614ba21bbd39
-      size: 85
+      md5: cfb143636dedc1a1a9f3ceb255c4f92d
+      size: 95
     - path: data/prepare.dir
       hash: md5
-      md5: ba41ad2bcd86d901cb6b6e58a6efa499.dir
-      size: 451724138
-      nfiles: 17
+      md5: 3f5ac66b4e7b8d7a8681f405b1890631.dir
+      size: 451651666
+      nfiles: 10
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
-    - path: data/prepare.dir
+    - path: data/search.dir
       hash: md5
-      md5: f7eb99316c3e4c82f7c2113fa1d0e378.dir
-      size: 10307635
-      nfiles: 7
+      md5: e78f42f707f423202506a74f8292a686.dir
+      size: 102984859504
+      nfiles: 1153
+    - path: src/shared/helpers.py
+      hash: md5
+      md5: 48e563e980be7bd4ff8e91b6af67e395
+      size: 210
+    - path: src/shared/learning.py
+      hash: md5
+      md5: c5a6ae4dac435531ed82c43eff6d41b4
+      size: 4495
     - path: src/train.py
       hash: md5
-      md5: 3007ee8e496f23fbe8f679883d95587e
-      size: 7287
+      md5: 872756ac76f280e671bdc52410c06481
+      size: 3720
     params:
       params.yaml:
-        model.asha.grace_period: 3
-        model.asha.max_t: 10
-        model.asha.n_trials: 5
-        model.asha.reduction_factor: 2
-        model.asha.trial_cpus: 1
-        model.asha.trial_gpus: 0.5
-        model.batch_size: 128
+        data.seed: 42
         model.checkpoint: google/vit-base-patch16-224-in21k
-        model.eval-test-size: 0.2
-        model.gradient_accumulation_steps: 4
-        model.hyperparameters.batch_sizes:
-        - 16
-        - 32
-        - 64
-        - 128
-        model.hyperparameters.learning_rate_max: 0.0001
-        model.hyperparameters.learning_rate_min: 1e-06
-        model.learning_rate: 5e-05
-        model.loading_steps: 10
-        model.logging_steps: 10
-        model.num_train_epochs: 10
-        model.seed: 42
-        model.test-size: 0.5
-        model.warmup_ratio: 0.1
+        model.labels_per_category:
+        - 900
+        - 600
+        - 300
+        - 90
+        - 60
+        - 30
+        trainer.gradient_accumulation_steps: 4
+        trainer.learning_rate: 1e-05
+        trainer.loading_steps: 10
+        trainer.logging_steps: 10
+        trainer.num_train_epochs: 30
+        trainer.per_device_eval_batch_size: 128
+        trainer.per_device_train_batch_size: 128
+        trainer.warmup_ratio: 0.1
     outs:
-    - path: data/train.dir
+    - path: models.json
       hash: md5
-      md5: f41d8a10ab6ef4b75e4f30c1d81eaedb.dir
-      size: 2059841129
-      nfiles: 56
+      md5: 079b10330e78b9e84c40d13349bdb2e4
+      size: 1265
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
@@ -134,35 +134,35 @@ stages:
       nfiles: 17
     - path: src/search.py
       hash: md5
-      md5: 1c2cee3322c410bc0fbad44e5c26d57f
-      size: 2524
+      md5: f053b99315f35a16b2484604fbb4500b
+      size: 2734
     - path: src/shared/data.py
       hash: md5
-      md5: 6d8dd068993db33ee6256893d32cc32f
-      size: 1084
+      md5: dbc74e7d866940984e936c0122c5031e
+      size: 1154
     - path: src/shared/helpers.py
       hash: md5
       md5: 48e563e980be7bd4ff8e91b6af67e395
       size: 210
     - path: src/shared/learning.py
       hash: md5
-      md5: fdf6b097a2235d7007c791f9f2d0c124
-      size: 4174
+      md5: c5a6ae4dac435531ed82c43eff6d41b4
+      size: 4495
     params:
       params.yaml:
         asha.grace_period: 3
-        asha.max_t: 10
-        asha.n_trials: 6
+        asha.max_t: 30
+        asha.n_trials: 50
         asha.reduction_factor: 2
         asha.trial_cpus: 1
         asha.trial_gpus: 0.5
+        data.seed: 42
         hyperparameters.batch_sizes:
         - 16
         - 32
         - 64
         - 128
-        hyperparameters.data.labels_per_category: 300
-        hyperparameters.data.seed: 42
+        hyperparameters.labels_per_category: 256
         hyperparameters.learning_rates:
         - 1e-06
         - 0.0001
@@ -171,13 +171,13 @@ stages:
         trainer.learning_rate: 1e-05
         trainer.loading_steps: 10
         trainer.logging_steps: 10
-        trainer.num_train_epochs: 10
+        trainer.num_train_epochs: 30
         trainer.per_device_eval_batch_size: 128
         trainer.per_device_train_batch_size: 128
         trainer.warmup_ratio: 0.1
     outs:
     - path: data/search.dir
       hash: md5
-      md5: 5d8f36b427ecbff26cf5121d3a4c3395.dir
-      size: 297599
-      nfiles: 45
+      md5: e78f42f707f423202506a74f8292a686.dir
+      size: 102984859504
+      nfiles: 1153

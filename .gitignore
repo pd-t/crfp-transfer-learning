@@ -12,3 +12,4 @@ dvc_plots
 /loss.json
 .vimspector.json
 /labels.json
+/models.json

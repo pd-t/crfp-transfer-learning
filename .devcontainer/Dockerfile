@@ -24,3 +24,9 @@ RUN groupadd --gid $USER_GID $USER_NAME \
 SHELL ["/bin/bash", "-c"]
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USER_NAME
+
+FROM base AS interpreter
+RUN pip install poetry
+RUN poetry config virtualenvs.create false
+COPY pyproject.toml poetry.lock .
+RUN poetry install
