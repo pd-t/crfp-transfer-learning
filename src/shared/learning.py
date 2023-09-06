@@ -81,7 +81,7 @@ class ModelMaker:
             save_best_model: bool,
             output_dir: str
             ):
-        if save_best_model == "no":
+        if save_best_model == False:
             save_strategy == "no"
             load_best_model_at_end = False
         else:

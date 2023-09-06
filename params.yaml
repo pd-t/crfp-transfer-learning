@@ -29,9 +29,9 @@ hyperparameters:
   batch_sizes: [16, 32, 64, 128]
 
 asha:
-  max_t: 30
+  max_t: 10
   grace_period: 3
   reduction_factor: 2
   trial_cpus: 1
   trial_gpus: .5
-  n_trials: 50
+  n_trials: 10
