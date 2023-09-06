@@ -1,5 +1,5 @@
 FROM nvidia/cuda:11.8.0-base-ubuntu22.04 as base
-RUN apt update && apt install -y --no-install-recommends git ssh python3 python3-pip
+RUN apt update && apt install -y --no-install-recommends git ssh python3 python3-pip screen
 RUN ln -s /usr/bin/python3 /usr/bin/python
 ENV PATH="$PATH:/home/user/.local/bin"
 
@@ -24,9 +24,3 @@ RUN groupadd --gid $USER_GID $USER_NAME \
 SHELL ["/bin/bash", "-c"]
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $USER_NAME
-
-FROM base AS interpreter
-RUN pip install poetry
-RUN poetry config virtualenvs.create false
-COPY pyproject.toml poetry.lock .
-RUN poetry install

@@ -82,10 +82,10 @@ class ModelMaker:
             output_dir: str
             ):
         if save_best_model == False:
-            save_strategy == "no"
+            save_strategy = "no"
             load_best_model_at_end = False
         else:
-            save_strategy="epoch"
+            save_strategy = "epoch"
             load_best_model_at_end = True
         
         training_args = TrainingArguments(
