@@ -15,6 +15,7 @@
 		// Re-use local Git configuration
 		"source=${localEnv:HOME}/.gitconfig,target=/home/user/.gitconfig,type=bind,consistency=cached"
 	],
+	"shutdownAction": "none",
 	"customizations": {
 		// Configure properties specific to VS Code.
 		"vscode": {
