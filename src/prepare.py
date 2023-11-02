@@ -3,15 +3,15 @@ from datasets import DatasetDict, Dataset, load_from_disk
 from pathlib import Path
 from shared.helpers import write_json
 from shared.data import balance
-
+from collections import Counter
 
 def train_test_split(dataset, **kwargs):
     dev_test_split = dataset.train_test_split(
-        train_size=kwargs["development-size"], 
+        test_size=kwargs["test-size"], 
         seed=kwargs["seed"]
     )
-    train_eval_split = dev_test_split["test"].train_test_split(
-        train_size=kwargs["development-train-size"], 
+    train_eval_split = dev_test_split["train"].train_test_split(
+        train_size=kwargs["train-size"], 
         seed=kwargs["seed"]
     )
     dataset = DatasetDict(
@@ -24,22 +24,23 @@ def train_test_split(dataset, **kwargs):
     return dataset
 
 
-def save_data_metrics(dataset: Dataset, labels_per_category: int):
-    data_metrics = {
-            split: dataset[split].num_rows 
-            for split in dataset.keys()
-            }
-    data_metrics["labels_per_category"] = labels_per_category
-    write_json("data.json", data_metrics)
+def save_data_metrics(dataset: Dataset, **kwargs):
+    metrics = {}
+    for split_name, split in dataset.items():
+        metrics[split_name] = {
+            'size': len(split),
+            'labels': dict(Counter(split['label'])),
+            'fractions': {k: v/len(split) for k, v in dict(Counter(split['label'])).items()}
+        }
+    write_json(kwargs['logging_file'], metrics)
+
 
 def prepare(dataset: Dataset, **kwargs) -> Dataset:
     splitted_dataset = train_test_split(
         dataset, 
         **params['data']
     )
-    balanced_train_dataset, labels_per_category = balance(splitted_dataset["train"])
-    save_data_metrics(splitted_dataset, labels_per_category)
-    splitted_dataset["train"] = balanced_train_dataset
+    save_data_metrics(splitted_dataset, **params['data'])
     return splitted_dataset
 
 if __name__ == '__main__':
