@@ -4,14 +4,10 @@ data:
     s3_bucket: 'data'
     s3_path: 'dlr/Tapelegedaten2023.zip'
   select: 'Complete'
-  development-size: 0.67
-  development-train-size: 0.9
+  test-size: 0.3
+  train-size: 0.9
   seed: 42
-
-model:
-  checkpoint: 'google/vit-base-patch16-224-in21k'
-  image_size: [224, 224]
-  labels_per_category: [900, 600, 300, 90, 60, 30]
+  logging_file: 'data.json'
 
 trainer:
   learning_rate: 1e-5
@@ -23,10 +19,17 @@ trainer:
   loading_steps: 10
   logging_steps: 10
 
+model:
+  checkpoint: 'google/vit-base-patch16-224-in21k'
+  image_size: [224, 224]
+  labels_per_category: [900, 600, 300, 90, 60, 30]
+  logging_file : 'model.json'
+
 hyperparameters:
   labels_per_category: 256
   learning_rates: [1e-6, 1e-4]
   batch_sizes: [16, 32, 64, 128]
+  logging_file: 'hyper.json'
 
 asha:
   max_t: 30
