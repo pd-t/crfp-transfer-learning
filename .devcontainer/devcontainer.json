@@ -25,9 +25,12 @@
 			},
 			
 			// Add the IDs of extensions you want installed when the container is created.
+			// Add python and linting extensions, jupyter and copilot
 			"extensions": [
 				"ms-python.python",
-				"ms-python.vscode-pylance"
+				"ms-python.vscode-pylance",
+				"ms-toolsai.jupyter",
+				"GitHub.copilot"
 			]
 		}
 	}
