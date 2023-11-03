@@ -34,16 +34,41 @@ def get_accuracy(predicted_dataset):
     return accuracies
 
 
-def select_training_data(dataset, limit, seed):
-    return dataset.shuffle(seed=seed).select(range(limit))
+def select_training_data(
+        dataset, 
+        labels_per_category, 
+        seed
+        ):
+    return dataset.shuffle(seed=seed).select(range(labels_per_category))
 
 
-def train(dataset: datasets.DatasetDict, hyperparameters: dict, **kwargs):
+def train_trainer(dataset, model_maker, path, kwargs):
+    temp_dir = 'data/tmp.dir'
+    Path(temp_dir).mkdir(parents=True, exist_ok=True)
+    trainer = model_maker.get_trainer(
+            dataset, 
+            trainer_args=kwargs["trainer"], 
+            save_best_model=True, 
+            output_dir=temp_dir,
+            )
+    trainer.train()
+    # join path and filename
+    log_filename = path + '/trainer_log.json'
+    save_trainer_log(trainer, log_filename)
+    shutil.rmtree(temp_dir, ignore_errors=False, onerror=None)
+    return trainer
+
+def get_labels(dataset):
+    labels = {str(i): label for i, label in enumerate(get_id2labels(dataset))}
+    return labels
+
+def get_id2labels(dataset):
+    id2label = dataset.features["label"].names
+    return id2label
+
+def train(dataset: datasets.DatasetDict, hyperparameters: dict, train_dir: str, **kwargs):
     kwargs["learning_rate"] = hyperparameters["learning_rate"] 
     kwargs["per_device_train_batch_size"] = hyperparameters["per_device_train_batch_size"]
-    
-    id2label = dataset["test"].features["label"].names
-    labels = {str(i): label for i, label in enumerate(id2label)}
     
     model_maker = ModelMaker(checkpoints=kwargs["model"]["checkpoint"])
 
@@ -53,36 +78,39 @@ def train(dataset: datasets.DatasetDict, hyperparameters: dict, **kwargs):
     metrics.update({"model": kwargs["model"]["checkpoint"]})
     metrics.update({"learning_rate": kwargs["learning_rate"]})
     metrics.update({"batch_size": kwargs["per_device_train_batch_size"]})
-    metrics.update({"labels": labels})
-    metrics.update({"labels_per_category": []})
+    metrics.update({"labels": get_labels(dataset["test"])})
+    metrics.update({"models": []})
 
-    for lpc in kwargs["model"]["labels_per_category"]:
-        temp_dir = 'data/tmp.dir'
-        Path(temp_dir).mkdir(parents=True, exist_ok=True)
-        dataset["train"] = select_training_data(original_training_dataset, lpc, kwargs["data"]["seed"])
-
-        trainer = model_maker.get_trainer(
-            dataset, 
-            trainer_args=kwargs["trainer"], 
-            save_best_model=True, 
-            output_dir=temp_dir,
-            )
-        trainer.train()
-        save_trainer_log(trainer, 'data/train.dir/trainer_log_' + str(lpc) + '.json')
-        
+    for labels_per_category in kwargs["model"]["labels_per_category"]:
         model_metrics = {}
-        model_metrics.update({"labels_per_category": lpc})
-        predicted_test_dataset = model_maker.predict(trainer, dataset["test"].select(range(100)))
-        save_labels(predicted_test_dataset, id2label, 'data/train.dir/labels_' + str(lpc) + '.json')
-        accuracy = get_accuracy(predicted_test_dataset)
-        model_metrics.update(accuracy)
-        metrics["labels_per_category"].append(model_metrics)
+        model_metrics.update({"labels_per_category": labels_per_category})
+
+        model_dir = train_dir + '/' + str(labels_per_category)
+        Path(model_dir).mkdir(parents=True, exist_ok=True)
+
+        dataset["train"] = select_training_data(
+            dataset=original_training_dataset,
+            labels_per_category=labels_per_category, 
+            seed=kwargs["data"]["seed"]
+            )
         
-        shutil.rmtree(temp_dir, ignore_errors=False, onerror=None)
+        trainer = train_trainer(dataset, model_maker, model_dir, kwargs)
+        
+        accuracy = test_trainer(dataset, model_maker, trainer, model_dir)
+        model_metrics.update(accuracy)
+
+        metrics["models"].append(model_metrics)
+        
     return metrics
 
+def test_trainer(dataset, model_maker, trainer, model_dir):
+    predicted_test_dataset = model_maker.predict(trainer, dataset['test'])
+    save_labels(predicted_test_dataset, get_id2labels(dataset['test']), model_dir + '/predicted_test_dataset.json')
+    return get_accuracy(predicted_test_dataset)
+
 if __name__=='__main__':
-    Path('data/train.dir').mkdir(parents=True, exist_ok=True)
+    train_dir = 'data/train.dir'
+    Path(train_dir).mkdir(parents=True, exist_ok=True)
 
     stage_params = dvc.api.params_show(stages=['train'])
     
@@ -90,5 +118,5 @@ if __name__=='__main__':
     
     searched_hyperparameters = load_json("data/search.dir/hyperparameters.json")
 
-    trained_metrics = train(prepared_dataset, searched_hyperparameters, **stage_params)
+    trained_metrics = train(prepared_dataset, searched_hyperparameters, train_dir, **stage_params)
     write_json("models.json", trained_metrics)
