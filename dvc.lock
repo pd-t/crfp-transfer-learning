@@ -17,21 +17,21 @@ stages:
     outs:
     - path: data/load.dir
       hash: md5
-      md5: ca839712a209e9fba6f8bd634a990aab.dir
-      size: 1072939781
-      nfiles: 16
+      md5: 22cf1c666ff5bfeb9539ff9837ea0cbb.dir
+      size: 1073962413
+      nfiles: 20
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     deps:
     - path: data/load.dir
       hash: md5
-      md5: ca839712a209e9fba6f8bd634a990aab.dir
-      size: 1072939781
-      nfiles: 16
+      md5: 22cf1c666ff5bfeb9539ff9837ea0cbb.dir
+      size: 1073962413
+      nfiles: 20
     - path: src/prepare.py
       hash: md5
-      md5: 9f2c0de893db9cae7aee30e71d892b25
-      size: 1709
+      md5: 1dba9598335684ebabcb95feee321306
+      size: 1671
     - path: src/shared/data.py
       hash: md5
       md5: dbc74e7d866940984e936c0122c5031e
@@ -42,27 +42,28 @@ stages:
       size: 210
     params:
       params.yaml:
-        data.development-size: 0.67
-        data.development-train-size: 0.9
+        data.logging_file: data.json
         data.seed: 42
+        data.test-size: 0.3
+        data.train-size: 0.9
     outs:
     - path: data.json
       hash: md5
-      md5: cfb143636dedc1a1a9f3ceb255c4f92d
-      size: 95
+      md5: d4bf9a88ce2d94171394faf56ce018d6
+      size: 871
     - path: data/prepare.dir
       hash: md5
-      md5: 0e5ce2a1253560cf628b512bdd0ddfc6.dir
-      size: 451747794
-      nfiles: 18
+      md5: e483f2b895d0c2e6908f5534809ae5ef.dir
+      size: 1098455465
+      nfiles: 19
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
     - path: data/search.dir
       hash: md5
-      md5: 6e257c30aec5d0b7f3e384a81f48b837.dir
-      size: 451519
-      nfiles: 73
+      md5: 53d69870ee169b58dec400081d95e41e.dir
+      size: 3151912
+      nfiles: 353
     - path: src/shared/helpers.py
       hash: md5
       md5: 48e563e980be7bd4ff8e91b6af67e395
@@ -73,8 +74,8 @@ stages:
       size: 4497
     - path: src/train.py
       hash: md5
-      md5: 872756ac76f280e671bdc52410c06481
-      size: 3720
+      md5: a816e72f362189c819ae4e0b4c0a12fa
+      size: 4471
     params:
       params.yaml:
         data.seed: 42
@@ -83,22 +84,25 @@ stages:
         - 900
         - 600
         - 300
-        - 90
-        - 60
-        - 30
+        - 100
         trainer.gradient_accumulation_steps: 4
         trainer.learning_rate: 1e-05
         trainer.loading_steps: 10
         trainer.logging_steps: 10
-        trainer.num_train_epochs: 10
+        trainer.num_train_epochs: 30
         trainer.per_device_eval_batch_size: 128
         trainer.per_device_train_batch_size: 128
         trainer.warmup_ratio: 0.1
     outs:
+    - path: data/train.dir
+      hash: md5
+      md5: ae16af24aaa78415375769f8eafcefea.dir
+      size: 7911768
+      nfiles: 8
     - path: models.json
       hash: md5
-      md5: b01cbe387604bdc07537edf79e3665be
-      size: 1326
+      md5: e4b79e8faee0e5b2c8a22d29d1f73d5e
+      size: 926
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
@@ -129,9 +133,9 @@ stages:
     deps:
     - path: data/prepare.dir
       hash: md5
-      md5: 0e5ce2a1253560cf628b512bdd0ddfc6.dir
-      size: 451747794
-      nfiles: 18
+      md5: e483f2b895d0c2e6908f5534809ae5ef.dir
+      size: 1098455465
+      nfiles: 19
     - path: src/search.py
       hash: md5
       md5: f053b99315f35a16b2484604fbb4500b
@@ -151,8 +155,8 @@ stages:
     params:
       params.yaml:
         asha.grace_period: 3
-        asha.max_t: 10
-        asha.n_trials: 10
+        asha.max_t: 30
+        asha.n_trials: 50
         asha.reduction_factor: 2
         asha.trial_cpus: 1
         asha.trial_gpus: 0.5
@@ -171,13 +175,39 @@ stages:
         trainer.learning_rate: 1e-05
         trainer.loading_steps: 10
         trainer.logging_steps: 10
-        trainer.num_train_epochs: 10
+        trainer.num_train_epochs: 30
         trainer.per_device_eval_batch_size: 128
         trainer.per_device_train_batch_size: 128
         trainer.warmup_ratio: 0.1
     outs:
     - path: data/search.dir
       hash: md5
-      md5: 6e257c30aec5d0b7f3e384a81f48b837.dir
-      size: 451519
-      nfiles: 73
+      md5: 53d69870ee169b58dec400081d95e41e.dir
+      size: 3151912
+      nfiles: 353
+  eval:
+    cmd: PYTHONPATH="." python src/eval.py
+    deps:
+    - path: data/train.dir
+      hash: md5
+      md5: ae16af24aaa78415375769f8eafcefea.dir
+      size: 7911768
+      nfiles: 8
+    - path: src/eval.py
+      hash: md5
+      md5: 4a63cd2f2187ca0045d31e32ed103951
+      size: 2287
+    - path: src/shared/helpers.py
+      hash: md5
+      md5: 48e563e980be7bd4ff8e91b6af67e395
+      size: 210
+    - path: src/shared/learning.py
+      hash: md5
+      md5: 407af990b24b42f13496d1e3599f864e
+      size: 4497
+    outs:
+    - path: data/eval.dir
+      hash: md5
+      md5: 2431cf860bfdffa056443458a0ce6fa0.dir
+      size: 248124
+      nfiles: 16
