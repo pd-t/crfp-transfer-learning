@@ -15,9 +15,11 @@ stages:
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
     params:
-      - data.development-size
-      - data.development-train-size
+      - data.test-size
+      - data.train-size
       - data.seed
+      - data.logging_file
+
     deps:
       - data/load.dir
       - src/shared/data.py
