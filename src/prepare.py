@@ -2,7 +2,6 @@ import dvc.api
 from datasets import DatasetDict, Dataset, load_from_disk
 from pathlib import Path
 from shared.helpers import write_json
-from shared.data import balance
 from collections import Counter
 
 def train_test_split(dataset, **kwargs):

@@ -3,6 +3,7 @@ import shutil
 import dvc.api
 from pathlib import Path
 from shared.helpers import load_json, write_json
+from shared.data import balance_dataset
 from shared.learning import ModelMaker
 import datasets
 import numpy as np
@@ -97,7 +98,7 @@ def train(dataset: datasets.DatasetDict, hyperparameters: dict, train_dir: str, 
         model_dir = train_dir + '/' + str(labels_per_category)
         Path(model_dir).mkdir(parents=True, exist_ok=True)
 
-        dataset["train"] = select_training_data(
+        dataset["train"] = balance_dataset(
             dataset=original_training_dataset,
             labels_per_category=labels_per_category, 
             seed=kwargs["data"]["seed"]

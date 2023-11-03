@@ -7,7 +7,7 @@ from pathlib import Path
 import dvc.api
 from shared.helpers import write_json
 from shared.learning import ModelMaker
-from shared.data import balance
+from shared.data import balance_dataset
 
 def ray_hp_space(
         learning_rate_min: float,
@@ -25,7 +25,7 @@ def ray_hp_space(
 def search(dataset, **kwargs):
     labels_per_category = kwargs["hyperparameters"]["labels_per_category"]
 
-    search_training_dataset, labels_per_category = balance(
+    search_training_dataset, labels_per_category = balance_dataset(
         dataset["train"],
         labels_per_category=labels_per_category,
         seed=kwargs["data"]["seed"]
