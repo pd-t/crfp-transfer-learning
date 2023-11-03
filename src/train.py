@@ -20,6 +20,16 @@ def save_trainer_log(trainer, filename):
     write_json(filename, log)
 
 
+def get_labels(dataset):
+    labels = {str(i): label for i, label in enumerate(get_id2labels(dataset))}
+    return labels
+
+
+def get_id2labels(dataset):
+    id2label = dataset.features["label"].names
+    return id2label
+
+
 def get_accuracy(predicted_dataset):
     predictions = np.argmax(predicted_dataset.predictions, axis=1)
     references = predicted_dataset.label_ids
@@ -58,13 +68,12 @@ def train_trainer(dataset, model_maker, path, kwargs):
     shutil.rmtree(temp_dir, ignore_errors=False, onerror=None)
     return trainer
 
-def get_labels(dataset):
-    labels = {str(i): label for i, label in enumerate(get_id2labels(dataset))}
-    return labels
 
-def get_id2labels(dataset):
-    id2label = dataset.features["label"].names
-    return id2label
+def test_trainer(dataset, model_maker, trainer, model_dir):
+    predicted_test_dataset = model_maker.predict(trainer, dataset['test'])
+    save_labels(predicted_test_dataset, get_id2labels(dataset['test']), model_dir + '/predicted_test_dataset.json')
+    return get_accuracy(predicted_test_dataset)
+
 
 def train(dataset: datasets.DatasetDict, hyperparameters: dict, train_dir: str, **kwargs):
     kwargs["learning_rate"] = hyperparameters["learning_rate"] 
@@ -96,17 +105,12 @@ def train(dataset: datasets.DatasetDict, hyperparameters: dict, train_dir: str, 
         
         trainer = train_trainer(dataset, model_maker, model_dir, kwargs)
         
-        accuracy = test_trainer(dataset, model_maker, trainer, model_dir)
-        model_metrics.update(accuracy)
+        accuracies = test_trainer(dataset, model_maker, trainer, model_dir)
+        model_metrics.update(accuracies)
 
         metrics["models"].append(model_metrics)
-        
     return metrics
 
-def test_trainer(dataset, model_maker, trainer, model_dir):
-    predicted_test_dataset = model_maker.predict(trainer, dataset['test'])
-    save_labels(predicted_test_dataset, get_id2labels(dataset['test']), model_dir + '/predicted_test_dataset.json')
-    return get_accuracy(predicted_test_dataset)
 
 if __name__=='__main__':
     train_dir = 'data/train.dir'
