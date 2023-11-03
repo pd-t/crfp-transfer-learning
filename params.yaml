@@ -22,7 +22,7 @@ trainer:
 model:
   checkpoint: 'google/vit-base-patch16-224-in21k'
   image_size: [224, 224]
-  labels_per_category: [900, 600, 300, 90, 60, 30]
+  labels_per_category: [900, 600, 300, 100]
   logging_file : 'models.json'
 
 hyperparameters:

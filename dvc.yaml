@@ -80,5 +80,17 @@ stages:
       - src/shared/helpers.py
       - src/shared/learning.py
       - src/train.py
+    outs:
+      - data/train.dir
     metrics:
       - models.json
+
+  eval:
+    cmd: PYTHONPATH="." python src/eval.py
+    deps:
+      - data/train.dir
+      - src/shared/helpers.py
+      - src/shared/learning.py
+      - src/eval.py
+    outs:
+      - data/eval.dir
