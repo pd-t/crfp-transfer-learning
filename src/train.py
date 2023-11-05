@@ -93,17 +93,17 @@ def train(dataset: datasets.DatasetDict, hyperparameters: dict, train_dir: str, 
 
     for labels_per_category in kwargs["model"]["labels_per_category"]:
         model_metrics = {}
-        model_metrics.update({"labels_per_category": labels_per_category})
 
         model_dir = train_dir + '/' + str(labels_per_category)
         Path(model_dir).mkdir(parents=True, exist_ok=True)
 
-        dataset["train"] = balance_dataset(
+        dataset["train"], selected_labels_per_category = balance_dataset(
             dataset=original_training_dataset,
             labels_per_category=labels_per_category, 
             seed=kwargs["data"]["seed"]
             )
-        
+        model_metrics.update({"labels_per_category": selected_labels_per_category})
+
         trainer = train_trainer(dataset, model_maker, model_dir, kwargs)
         
         accuracies = test_trainer(dataset, model_maker, trainer, model_dir)

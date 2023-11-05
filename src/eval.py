@@ -6,7 +6,6 @@ from shared.helpers import load_json, write_json
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import json
 
 def extract_values_from_log(trainer_log, key):
     return [item[key] for item in trainer_log["trainer"] if key in item.keys()]

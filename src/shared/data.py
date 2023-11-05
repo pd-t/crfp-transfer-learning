@@ -24,14 +24,14 @@ def balance_dataset(
     max_labels_per_category = min(data.num_rows for data in sorted_datasets)
     
     if labels_per_category is not None:
-        actual_labels_per_category = min(max_labels_per_category, 
+        selected_labels_per_category = min(max_labels_per_category, 
                                               labels_per_category)
     else:
-        actual_labels_per_category = max_labels_per_category
+        selected_labels_per_category = max_labels_per_category
         
     
     balanced_dataset = concatenate_datasets(
-            [fd.shuffle(seed=seed).select(range(actual_labels_per_category)) for fd in sorted_datasets]
+            [fd.shuffle(seed=seed).select(range(selected_labels_per_category)) for fd in sorted_datasets]
             )
 
-    return balanced_dataset, actual_labels_per_category
+    return balanced_dataset, selected_labels_per_category
