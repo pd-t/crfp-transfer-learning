@@ -94,3 +94,6 @@ stages:
       - src/eval.py
     outs:
       - data/eval.dir
+    plots:
+      - losses.png
+      - accuracies.png

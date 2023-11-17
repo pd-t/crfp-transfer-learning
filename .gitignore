@@ -13,3 +13,5 @@ dvc_plots
 .vimspector.json
 /labels.json
 /models.json
+/losses.png
+/accuracies.png
