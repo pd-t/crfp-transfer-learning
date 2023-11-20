@@ -24,9 +24,7 @@ model:
   image_size: [224, 224]
   labels_per_category: [300, 200, 100]
   logging_file : 'models.json'
-
-eval:
-  logging_file: 'cml.json'
+  cml_file: 'cml.json'
 
 hyperparameters:
   labels_per_category: 256
@@ -40,3 +38,6 @@ asha:
   trial_cpus: 1
   trial_gpus: .5
   n_trials: 10
+
+cml:
+  logging_file: 'cml.json'

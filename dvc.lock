@@ -30,8 +30,8 @@ stages:
       nfiles: 20
     - path: src/prepare.py
       hash: md5
-      md5: be40b9fcc978d4f2554c4645765690b4
-      size: 1639
+      md5: eaf22a0f9cdaf73057a90102c5e75801
+      size: 1699
     - path: src/shared/data.py
       hash: md5
       md5: ace017e5b2950187c30244f6b791ae62
@@ -42,20 +42,20 @@ stages:
       size: 210
     params:
       params.yaml:
-        data.logging_file: data.json
+        data.logging_file: split.json
         data.seed: 42
         data.test-size: 0.3
         data.train-size: 0.9
     outs:
-    - path: data.json
+    - path: data/prepare.dir
+      hash: md5
+      md5: 89722bfb747baf5f8afae6bfb99d7d86.dir
+      size: 1096947849
+      nfiles: 11
+    - path: data/split.json
       hash: md5
       md5: d4bf9a88ce2d94171394faf56ce018d6
       size: 871
-    - path: data/prepare.dir
-      hash: md5
-      md5: 6253adefff464aab0038684aecd01764.dir
-      size: 1098076705
-      nfiles: 18
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
@@ -181,8 +181,8 @@ stages:
     outs:
     - path: data/search.dir
       hash: md5
-      md5: e4399e0099d6ed5b7c6a109b22712c9b.dir
-      size: 541675
+      md5: 523d6cad67a7bd7a3ac0856066b342a1.dir
+      size: 581759
       nfiles: 73
   eval:
     cmd: PYTHONPATH="." python src/eval.py

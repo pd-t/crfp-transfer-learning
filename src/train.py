@@ -125,4 +125,4 @@ if __name__=='__main__':
 
     trained_metrics = train(prepared_dataset, searched_hyperparameters, train_dir, **stage_params)
 
-    write_json("data/" + stage_params['logging_file'], trained_metrics)
+    write_json("data/" + stage_params['model']['logging_file'], trained_metrics)

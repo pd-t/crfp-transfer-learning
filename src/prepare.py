@@ -51,4 +51,4 @@ if __name__ == '__main__':
     prepared_dataset, prepared_metrics = prepare(loaded_dataset, **params['data'])
     prepared_dataset.save_to_disk("data/prepare.dir/dataset")
 
-    write_json("data/" + params['logging_file'], prepared_metrics)
+    write_json("data/" + params['data']['logging_file'], prepared_metrics)

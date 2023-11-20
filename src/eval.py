@@ -72,19 +72,19 @@ def eval(input_dir, output_dir, **kwargs):
     plot_overview(losses_and_accuracies, "losses", "eval_loss")
     # plot all accuracies in a single plot
     plot_overview(losses_and_accuracies, "accuracies", "eval_accuracy")
-    return get_metrics(dvc.api.params_show(stages=['train']))
+    return get_metrics(**kwargs)
 
 
 def get_metrics(**kwargs):
     #get models, learning rate and batch size from model.json
-    model = load_json("data/" + kwargs['logging_file'])
+    logging_file = load_json("data/" + kwargs['model']['logging_file'])
     metrics = {}
-    metrics.update({"model": model["checkpoint"]})
-    metrics.update({"learning_rate": model["learning_rate"]})
-    metrics.update({"batch_size": model["per_device_train_batch_size"]})
+    metrics.update({"model": logging_file["checkpoint"]})
+    metrics.update({"learning_rate": logging_file["learning_rate"]})
+    metrics.update({"batch_size": logging_file["per_device_train_batch_size"]})
     # iterate through models in models json and add labels per category as key to metrics with value of accuracy
-    for model in model["models"]:
-        metrics.update({model["labels_per_category"]: model["accuracy"]})
+    for logging_file in logging_file["models"]:
+        metrics.update({logging_file["labels_per_category"]: logging_file["accuracy"]})
     return metrics
 
 
@@ -95,4 +95,4 @@ if __name__=='__main__':
 
     stage_params = dvc.api.params_show(stages=['eval'])
     eval_metrics = eval(input_dir, output_dir, **stage_params)
-    write_json("data/" + stage_params['logging_file'], eval_metrics)
+    write_json("data/" + stage_params['cml']['logging_file'], eval_metrics)
