@@ -7,7 +7,7 @@ data:
   test-size: 0.3
   train-size: 0.9
   seed: 42
-  logging_file: 'data.json'
+  logging_file: 'split.json'
 
 trainer:
   learning_rate: 1e-5
@@ -24,6 +24,9 @@ model:
   image_size: [224, 224]
   labels_per_category: [300, 200, 100]
   logging_file : 'models.json'
+
+eval:
+  logging_file: 'cml.json'
 
 hyperparameters:
   labels_per_category: 256

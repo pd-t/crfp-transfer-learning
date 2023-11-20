@@ -124,4 +124,5 @@ if __name__=='__main__':
     searched_hyperparameters = load_json("data/search.dir/hyperparameters.json")
 
     trained_metrics = train(prepared_dataset, searched_hyperparameters, train_dir, **stage_params)
-    write_json("models.json", trained_metrics)
+
+    write_json("data/" + stage_params['logging_file'], trained_metrics)

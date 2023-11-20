@@ -54,6 +54,14 @@ def make_plots_per_path(output_dir, input_path):
     return tag, losses, accuracies
 
 
+def plot_overview(losses_and_accuracies, key, property):
+    plt.clf()
+    for tag, values in losses_and_accuracies.items():
+        sns.lineplot(data=values[key], x="epoch", y=property, label=tag)
+    plt.legend()
+    plt.savefig(key + '.png')
+
+
 def eval(input_dir, output_dir, **kwargs):
     # itearte over all subfolders in the input directory and for ech subfolder make an output subfolder
     losses_and_accuracies = {}
@@ -64,13 +72,20 @@ def eval(input_dir, output_dir, **kwargs):
     plot_overview(losses_and_accuracies, "losses", "eval_loss")
     # plot all accuracies in a single plot
     plot_overview(losses_and_accuracies, "accuracies", "eval_accuracy")
+    return get_metrics(dvc.api.params_show(stages=['train']))
 
-def plot_overview(losses_and_accuracies, key, property):
-    plt.clf()
-    for tag, values in losses_and_accuracies.items():
-        sns.lineplot(data=values[key], x="epoch", y=property, label=tag)
-    plt.legend()
-    plt.savefig(key + '.png')
+
+def get_metrics(**kwargs):
+    #get models, learning rate and batch size from model.json
+    model = load_json("data/" + kwargs['logging_file'])
+    metrics = {}
+    metrics.update({"model": model["checkpoint"]})
+    metrics.update({"learning_rate": model["learning_rate"]})
+    metrics.update({"batch_size": model["per_device_train_batch_size"]})
+    # iterate through models in models json and add labels per category as key to metrics with value of accuracy
+    for model in model["models"]:
+        metrics.update({model["labels_per_category"]: model["accuracy"]})
+    return metrics
 
 
 if __name__=='__main__':
@@ -79,5 +94,5 @@ if __name__=='__main__':
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
     stage_params = dvc.api.params_show(stages=['eval'])
-    
-    eval(input_dir, output_dir, **stage_params)
+    eval_metrics = eval(input_dir, output_dir, **stage_params)
+    write_json("data/" + stage_params['logging_file'], eval_metrics)

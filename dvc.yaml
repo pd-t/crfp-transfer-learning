@@ -19,7 +19,6 @@ stages:
       - data.train-size
       - data.seed
       - data.logging_file
-
     deps:
       - data/load.dir
       - src/shared/data.py
@@ -28,7 +27,7 @@ stages:
     outs:
       - data/prepare.dir
     metrics:
-      - data.json
+      - data/split.json
 
   search:
     cmd: PYTHONPATH="." python src/search.py
@@ -83,7 +82,7 @@ stages:
     outs:
       - data/train.dir
     metrics:
-      - models.json
+      - /data/models.json
 
   eval:
     cmd: PYTHONPATH="." python src/eval.py
@@ -94,6 +93,8 @@ stages:
       - src/eval.py
     outs:
       - data/eval.dir
+    metrics:
+      - data/cml.json
     plots:
-      - losses.png
-      - accuracies.png
+      - data/losses.png
+      - data/accuracies.png
