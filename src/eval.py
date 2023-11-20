@@ -59,7 +59,7 @@ def plot_overview(losses_and_accuracies, key, property):
     for tag, values in losses_and_accuracies.items():
         sns.lineplot(data=values[key], x="epoch", y=property, label=tag)
     plt.legend()
-    plt.savefig(key + '.png')
+    plt.savefig("plots/" + key + '.png')
 
 
 def eval(input_dir, output_dir, **kwargs):
@@ -77,14 +77,14 @@ def eval(input_dir, output_dir, **kwargs):
 
 def get_metrics(**kwargs):
     #get models, learning rate and batch size from model.json
-    logging_file = load_json("data/" + kwargs['model']['logging_file'])
+    models_logging = load_json("data/" + kwargs['model']['logging_file'])
     metrics = {}
-    metrics.update({"model": logging_file["checkpoint"]})
-    metrics.update({"learning_rate": logging_file["learning_rate"]})
-    metrics.update({"batch_size": logging_file["per_device_train_batch_size"]})
+    metrics.update({"checkpoint": models_logging['checkpoint']})
+    metrics.update({"learning_rate": models_logging["learning_rate"]})
+    metrics.update({"batch_size": models_logging["batch_size"]})
     # iterate through models in models json and add labels per category as key to metrics with value of accuracy
-    for logging_file in logging_file["models"]:
-        metrics.update({logging_file["labels_per_category"]: logging_file["accuracy"]})
+    for entry in models_logging["models"]:
+        metrics.update({entry["labels_per_category"]: entry["accuracy"]})
     return metrics
 
 
@@ -92,6 +92,7 @@ if __name__=='__main__':
     input_dir = 'data/train.dir'
     output_dir = 'data/eval.dir'
     Path(output_dir).mkdir(parents=True, exist_ok=True)
+    Path('plots').mkdir(parents=True, exist_ok=True)
 
     stage_params = dvc.api.params_show(stages=['eval'])
     eval_metrics = eval(input_dir, output_dir, **stage_params)

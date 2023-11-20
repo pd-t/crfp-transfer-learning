@@ -13,7 +13,7 @@ trainer:
   learning_rate: 1e-5
   per_device_train_batch_size: 128
   per_device_eval_batch_size: 128
-  num_train_epochs: 10
+  num_train_epochs: 1
   warmup_ratio: 0.1
   gradient_accumulation_steps: 4
   loading_steps: 10
@@ -22,7 +22,7 @@ trainer:
 model:
   checkpoint: 'google/vit-base-patch16-224-in21k'
   image_size: [224, 224]
-  labels_per_category: [300, 200, 100]
+  labels_per_category: [100]
   logging_file : 'models.json'
   cml_file: 'cml.json'
 
@@ -37,7 +37,7 @@ asha:
   reduction_factor: 2
   trial_cpus: 1
   trial_gpus: .5
-  n_trials: 10
+  n_trials: 3
 
 cml:
   logging_file: 'cml.json'

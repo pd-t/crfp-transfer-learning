@@ -85,7 +85,7 @@ def train(dataset: datasets.DatasetDict, hyperparameters: dict, train_dir: str, 
     original_training_dataset = copy.deepcopy(dataset["train"])
 
     metrics = {}
-    metrics.update({"model": kwargs["model"]["checkpoint"]})
+    metrics.update({"checkpoint": kwargs["model"]["checkpoint"]})
     metrics.update({"learning_rate": kwargs["learning_rate"]})
     metrics.update({"batch_size": kwargs["per_device_train_batch_size"]})
     metrics.update({"labels": get_labels(dataset["test"])})
