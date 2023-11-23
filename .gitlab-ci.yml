@@ -62,6 +62,7 @@ dvc-repro:
   script:
     - source .venv/bin/activate
     - bash auto-dvc-commit.sh
+  timeout: 24h
 
 cml:
   stage: report

@@ -3,6 +3,7 @@ from datasets import DatasetDict, Dataset, load_from_disk
 from pathlib import Path
 from shared.helpers import write_json
 from collections import Counter
+from shared.data import get_labels
 
 def train_test_split(dataset, **kwargs):
     dev_test_split = dataset.train_test_split(
@@ -25,11 +26,16 @@ def train_test_split(dataset, **kwargs):
 
 def get_metrics(dataset: Dataset, **kwargs):
     metrics = {}
+    labels = get_labels(dataset["test"])
     for split_name, split in dataset.items():
+        samples_per_label = dict(Counter(split['label']))
+        # replace key of samples_per_label with key of labels using the value if labels
+        labels_per_label = {labels[str(key)]: value for key, value in samples_per_label.items()}
+        # alphabetically sort labels_per_label
+        labels_per_label = dict(sorted(labels_per_label.items()))
         metrics[split_name] = {
             'size': len(split),
-            'labels': dict(Counter(split['label'])),
-            'fractions': {k: v/len(split) for k, v in dict(Counter(split['label'])).items()}
+            'labels': labels_per_label,
         }
     return metrics
 

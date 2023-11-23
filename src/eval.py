@@ -6,6 +6,7 @@ from shared.helpers import load_json, write_json
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.metrics import f1_score
 
 
 def extract_values_from_log(trainer_log, key):
@@ -19,73 +20,79 @@ def get_values_from_trainer_log(trainer_log, key):
     return data
 
 
-def make_trainer_plot(property, input_dir, output_dir): 
-    trainer_log = load_json(input_dir + '/trainer_log.json')
-    data = get_values_from_trainer_log(trainer_log, property)
-
-    df = pd.DataFrame(data['train'])
+def plot_trainer_property(property, trainer_dir, eval_dir): 
+    data = get_trainer_property(property, trainer_dir)
+    df = pd.DataFrame(data)
     plt.clf()
     sns.lineplot(data=df, x="epoch", y=property)
-    plt.savefig(output_dir + '/' + property + '.png')
-    return df
+    plt.savefig(eval_dir + '/' + property + '.png')
 
 
-def make_cm(input_dir, output_dir, normalize=None):
-    data = load_json(input_dir + '/predicted_test_dataset.json')
+def get_trainer_property(property, trainer_dir):
+    trainer_log = load_json(trainer_dir + '/trainer_log.json')
+    data = get_values_from_trainer_log(trainer_log, property)
+    return data['train']
+
+
+def plot_cm(trainer_dir, eval_dir, normalize=None):
+    data = load_json(trainer_dir + '/predicted_test_dataset.json')
     df = pd.DataFrame(data['labels'])
     cm = confusion_matrix(df["actual_label"], df["predicted_label"], normalize=normalize)
     plt.clf()
     sns.heatmap(cm, annot=True, cmap='Blues')
-    plt.savefig(output_dir + '/cm_normalize_' + str(normalize) + '.png')
+    plt.savefig(eval_dir + '/cm_normalize_' + str(normalize) + '.png')
 
 
-def make_plots_per_path(output_dir, input_path):
+def plot_overview(data, property):
+    plt.clf()
+    for tag, values in data.items():
+        df = pd.DataFrame(values[property])
+        sns.lineplot(data=df, x="epoch", y=property, label=tag)
+    plt.legend()
+    plt.savefig("plots/" + property + '.png')
+
+
+def prepare_output(output_dir, input_path):
     input_subdir = str(input_path)
     tag = input_subdir.split('/')[-1]
     output_subpath = os.path.join(output_dir, tag)
     Path(output_subpath).mkdir(parents=True, exist_ok=True)
     output_subdir = str(output_subpath)
-        
-    make_cm(input_subdir, output_subdir, normalize="true")
-    make_cm(input_subdir, output_subdir)
-
-    losses = make_trainer_plot("eval_loss", input_subdir, output_subdir)
-    accuracies = make_trainer_plot("eval_accuracy", input_subdir, output_subdir)
-    return tag, losses, accuracies
-
-
-def plot_overview(losses_and_accuracies, key, property):
-    plt.clf()
-    for tag, values in losses_and_accuracies.items():
-        sns.lineplot(data=values[key], x="epoch", y=property, label=tag)
-    plt.legend()
-    plt.savefig("plots/" + key + '.png')
+    return input_subdir, output_subdir
 
 
 def eval(input_dir, output_dir, **kwargs):
-    # itearte over all subfolders in the input directory and for ech subfolder make an output subfolder
-    losses_and_accuracies = {}
+    collected_data = {}
     for input_path in Path(input_dir).iterdir():
-        tag, losses, accuracies = make_plots_per_path(output_dir, input_path)
-        losses_and_accuracies[tag] = {"losses": losses, "accuracies": accuracies}  
+        trainer_dir, eval_dir = prepare_output(output_dir, input_path)
+
+        plot_cm(trainer_dir, eval_dir, normalize="true")
+        plot_cm(trainer_dir, eval_dir)
+
+        trainer_metrics = {}
+        for property in ["eval_loss", "eval_accuracy"]:
+            plot_trainer_property(property, trainer_dir, eval_dir)
+            trainer_metrics[property] = get_trainer_property(property, trainer_dir)
+        
+        tag = input_path.name
+        collected_data[tag] = trainer_metrics
     # plot all losses in a single plot
-    plot_overview(losses_and_accuracies, "losses", "eval_loss")
+    plot_overview(collected_data, "eval_loss")
     # plot all accuracies in a single plot
-    plot_overview(losses_and_accuracies, "accuracies", "eval_accuracy")
-    return get_metrics(**kwargs)
-
-
-def get_metrics(**kwargs):
-    #get models, learning rate and batch size from model.json
-    models_logging = load_json("data/" + kwargs['model']['logging_file'])
+    plot_overview(collected_data, "eval_accuracy")
     metrics = {}
-    metrics.update({"checkpoint": models_logging['checkpoint']})
-    metrics.update({"learning_rate": models_logging["learning_rate"]})
-    metrics.update({"batch_size": models_logging["batch_size"]})
-    # iterate through models in models json and add labels per category as key to metrics with value of accuracy
-    for entry in models_logging["models"]:
-        metrics.update({entry["labels_per_category"]: entry["accuracy"]})
+    metrics["f1-scores"] = get_f1scores(input_dir)
     return metrics
+
+
+def get_f1scores(trainer_dir, average='weighted'):
+    scores = {}
+    for input_path in Path(trainer_dir).iterdir():
+        tag = input_path.name
+        predictions = load_json(input_path / 'predicted_test_dataset.json')
+        df = pd.DataFrame(predictions["labels"])
+        scores[tag] = f1_score(df["actual_label"], df["predicted_label"], average=average)
+    return scores
 
 
 if __name__=='__main__':
@@ -96,4 +103,4 @@ if __name__=='__main__':
 
     stage_params = dvc.api.params_show(stages=['eval'])
     eval_metrics = eval(input_dir, output_dir, **stage_params)
-    write_json("data/" + stage_params['cml']['logging_file'], eval_metrics)
+    write_json("data/" + stage_params['report']['logging_file'], eval_metrics)

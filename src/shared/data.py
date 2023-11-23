@@ -1,6 +1,14 @@
 import numpy as np 
 from datasets import concatenate_datasets, Dataset
 
+def get_id2label(dataset):
+    id2label = dataset.features["label"].names
+    return id2label
+
+def get_labels(dataset):
+    labels = {str(i): label for i, label in enumerate(get_id2label(dataset))}
+    return labels
+
 def balance_dataset(
         dataset: Dataset, 
         labels_per_category=None, 

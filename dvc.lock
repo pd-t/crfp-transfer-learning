@@ -30,32 +30,32 @@ stages:
       nfiles: 9
     - path: src/prepare.py
       hash: md5
-      md5: eaf22a0f9cdaf73057a90102c5e75801
-      size: 1699
+      md5: d43e25e639cf76faf01dc546177333bc
+      size: 2025
     - path: src/shared/data.py
       hash: md5
-      md5: ace017e5b2950187c30244f6b791ae62
-      size: 1250
+      md5: d4099da48508ad4d447232c6e8fa559f
+      size: 1467
     - path: src/shared/helpers.py
       hash: md5
       md5: 48e563e980be7bd4ff8e91b6af67e395
       size: 210
     params:
       params.yaml:
-        data.logging_file: split.json
+        data.logging_file: data.json
         data.seed: 42
         data.test-size: 0.3
         data.train-size: 0.9
     outs:
+    - path: data/data.json
+      hash: md5
+      md5: aeae181fc66c054a39a370d9a20ba10c
+      size: 431
     - path: data/prepare.dir
       hash: md5
       md5: 5d98a46439beba5acb781aada9b0f4f2.dir
       size: 1098076705
       nfiles: 18
-    - path: data/split.json
-      hash: md5
-      md5: d4bf9a88ce2d94171394faf56ce018d6
-      size: 871
   train:
     cmd: PYTHONPATH="." python src/train.py
     deps:
@@ -140,8 +140,8 @@ stages:
       size: 2750
     - path: src/shared/data.py
       hash: md5
-      md5: ace017e5b2950187c30244f6b791ae62
-      size: 1250
+      md5: d4099da48508ad4d447232c6e8fa559f
+      size: 1467
     - path: src/shared/helpers.py
       hash: md5
       md5: 48e563e980be7bd4ff8e91b6af67e395
@@ -173,15 +173,15 @@ stages:
         trainer.learning_rate: 1e-05
         trainer.loading_steps: 10
         trainer.logging_steps: 10
-        trainer.num_train_epochs: 1
+        trainer.num_train_epochs: 2
         trainer.per_device_eval_batch_size: 128
         trainer.per_device_train_batch_size: 128
         trainer.warmup_ratio: 0.1
     outs:
     - path: data/search.dir
       hash: md5
-      md5: 800cb89d2db0792b721bf0381e920942.dir
-      size: 76385
+      md5: 4e1122ad951b5faf2bb4aa6a0626728b.dir
+      size: 93295
       nfiles: 24
   eval:
     cmd: PYTHONPATH="." python src/eval.py

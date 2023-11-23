@@ -27,7 +27,7 @@ stages:
     outs:
       - data/prepare.dir
     metrics:
-      - data/split.json
+      - data/data.json
 
   search:
     cmd: PYTHONPATH="." python src/search.py
@@ -91,7 +91,7 @@ stages:
       - model.checkpoint
       - model.labels_per_category
       - model.logging_file
-      - cml.logging_file
+      - report.logging_file
     deps:
       - data/train.dir
       - src/shared/helpers.py
@@ -100,7 +100,7 @@ stages:
     outs:
       - data/eval.dir
     metrics:
-      - data/cml.json
+      - data/report.json
     plots:
-      - plots/losses.png
-      - plots/accuracies.png
+      - plots/eval_loss.png
+      - plots/eval_accuracy.png
