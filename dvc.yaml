@@ -83,7 +83,7 @@ stages:
     outs:
       - data/train.dir
     metrics:
-      - data/models.json
+      - data/model.json
 
   eval:
     cmd: PYTHONPATH="." python src/eval.py
@@ -104,3 +104,4 @@ stages:
     plots:
       - plots/eval_loss.png
       - plots/eval_accuracy.png
+      - plots/data.png

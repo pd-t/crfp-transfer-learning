@@ -79,7 +79,8 @@ cml:
     - dvc metrics show
     - dvc metrics diff $latest_commit
     - dvc metrics diff --md $latest_commit >> report.md
-    - echo '![](./plots/losses.png "Training Losses")' >> report.md
-    - echo '![](./plots/accuracies.png "Training Accuracies")' >> report.md
+    - echo '![](./plots/eval_accuracy.png "Training Losses")' >> report.md
+    - echo '![](./plots/eval_loss.png "Training Accuracies")' >> report.md
+    - echo '![](./plots/data.png "Training Accuracies")' >> report.md
     
     - cml comment create report.md

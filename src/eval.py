@@ -82,8 +82,34 @@ def eval(input_dir, output_dir, **kwargs):
     plot_overview(collected_data, "eval_accuracy")
     metrics = {}
     metrics["f1-scores"] = get_f1scores(input_dir)
+    plot_data()
     return metrics
 
+def plot_data():
+    # load json at data/data.json
+    data = load_json("data/data.json")
+    splits = {}
+    plt.clf()
+    plt.figure(figsize=(30,10))
+    subplot = 2
+    for key, value in data.items():
+        splits[key] = value["size"]
+        plt.subplot(1, 4, subplot)
+        keys, values = get_keys_and_values(value["labels"])
+        plt.pie(values, labels=keys)
+        plt.title(key)
+        subplot += 1
+    keys, values = get_keys_and_values(splits) 
+    plt.subplot(1,4,1)
+    plt.pie(values, labels=keys)
+    plt.savefig("plots/data.png")
+                
+def get_keys_and_values(labels):    
+    # list of keys of labels
+    keys = [key for key in labels.keys()]
+    #list ov values
+    values = [value for value in labels.values()]
+    return keys, values
 
 def get_f1scores(trainer_dir, average='weighted'):
     scores = {}
