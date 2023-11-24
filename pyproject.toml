@@ -6,7 +6,7 @@ authors = ["Thomas Fraunholz <tf@wogra.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9"
 torch = { version = "2.0.1", source="torch"}
 torchaudio = { version = "2.0.2", source="torch"}
 torchvision = { version = "0.15.2", source="torch"}
