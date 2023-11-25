@@ -8,6 +8,7 @@ import dvc.api
 from shared.helpers import write_json
 from shared.learning import ModelMaker
 from shared.data import balance_dataset
+import os
 
 def ray_hp_space(
         learning_rate_min: float,
@@ -72,6 +73,8 @@ def search(dataset, **kwargs):
 
 
 if __name__ == '__main__':
+    print("Visible CUDA Devices: " + os.environ["CUDA_VISIBLE_DEVICES"])
+
     Path('data/search.dir').mkdir(parents=True, exist_ok=True)
     params = dvc.api.params_show(stages=['search'])
     

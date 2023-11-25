@@ -7,6 +7,7 @@ from shared.data import balance_dataset, get_id2label
 from shared.learning import ModelMaker
 import datasets
 import numpy as np
+import os
 
 
 def make_prediction_readable(predicted_dataset, id2label):
@@ -96,6 +97,8 @@ def train(dataset: datasets.DatasetDict, hyperparameters: dict, train_dir: str, 
 
 
 if __name__=='__main__':
+    print("Visible CUDA Devices: " + os.environ["CUDA_VISIBLE_DEVICES"])
+
     train_dir = 'data/train.dir'
     Path(train_dir).mkdir(parents=True, exist_ok=True)
 
