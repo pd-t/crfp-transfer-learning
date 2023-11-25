@@ -5,8 +5,8 @@ stages:
       - data.remote.s3_endpoint_url
       - data.remote.s3_bucket
       - data.remote.s3_path
-      - data.seed
       - data.select
+      - data.seed
     deps:
       - src/load.py
     outs:
@@ -14,69 +14,94 @@ stages:
 
   prepare:
     cmd: PYTHONPATH="." python src/prepare.py
+    params:
+      - data.test-size
+      - data.train-size
+      - data.seed
+      - data.logging_file
     deps:
       - data/load.dir
+      - src/shared/data.py
+      - src/shared/helpers.py
       - src/prepare.py
     outs:
       - data/prepare.dir
+    metrics:
+      - data/data.json
+
+  search:
+    cmd: PYTHONPATH="." python src/search.py
+    params:
+      - model.checkpoint
+      - trainer.learning_rate
+      - trainer.per_device_train_batch_size
+      - trainer.per_device_eval_batch_size
+      - trainer.num_train_epochs
+      - trainer.warmup_ratio
+      - trainer.gradient_accumulation_steps
+      - trainer.loading_steps
+      - trainer.logging_steps
+      - data.seed
+      - hyperparameters.labels_per_category
+      - hyperparameters.learning_rates
+      - hyperparameters.batch_sizes
+      - asha.max_t
+      - asha.grace_period
+      - asha.reduction_factor
+      - asha.trial_cpus
+      - asha.trial_gpus
+      - asha.n_trials
+    deps:
+      - data/prepare.dir
+      - src/shared/data.py
+      - src/shared/helpers.py
+      - src/shared/learning.py
+      - src/search.py
+    outs:
+      - data/search.dir
 
   train:
     cmd: PYTHONPATH="." python src/train.py
     params:
+      - data.seed
       - model.checkpoint
-      - model.eval-test-size
-      - model.test-size
-      - model.seed
-      - model.batch_size
-      - model.num_train_epochs
-      - model.learning_rate
-      - model.warmup_ratio
-      - model.loading_steps
-      - model.gradient_accumulation_steps
-      - model.logging_steps
-      - model.hyperparameters.learning_rate_min
-      - model.hyperparameters.learning_rate_max
-      - model.hyperparameters.batch_sizes
-      - model.asha.max_t
-      - model.asha.grace_period
-      - model.asha.reduction_factor
-      - model.asha.trial_cpus
-      - model.asha.trial_gpus
-      - model.asha.n_trials
+      - model.labels_per_category
+      - model.logging_file
+      - trainer.learning_rate
+      - trainer.per_device_train_batch_size
+      - trainer.per_device_eval_batch_size
+      - trainer.num_train_epochs
+      - trainer.warmup_ratio
+      - trainer.gradient_accumulation_steps
+      - trainer.loading_steps
+      - trainer.logging_steps
     deps:
-      - data/prepare.dir
+      - data/search.dir
+      - src/shared/helpers.py
+      - src/shared/learning.py
       - src/train.py
     outs:
       - data/train.dir
+    metrics:
+      - data/model.json
 
-  evaluate:
+  eval:
     cmd: PYTHONPATH="." python src/eval.py
+    params:
+      - model.checkpoint
+      - model.labels_per_category
+      - model.logging_file
+      - report.logging_file
     deps:
       - data/train.dir
+      - src/shared/helpers.py
+      - src/shared/learning.py
       - src/eval.py
-    plots:
-      - accuracy.json
-      - loss.json
+    outs:
+      - data/eval.dir
     metrics:
-      - metrics.json
-
-plots:
-  - ConfusionMatrix:
-          x: 
-            data/train.dir/tested_labels.json: actual_label
-          y: 
-            data/train.dir/tested_labels.json: predicted_label
-          title: Confusion Matrix for Test Data
-          template: confusion
-          x_label: Actual label
-          y_label: Predicted label
-  - ConfusionMatrixNormalized:
-          x: 
-            data/train.dir/tested_labels.json: actual_label
-          y: 
-            data/train.dir/tested_labels.json: predicted_label
-          title: Confusion Matrix for Test Data (Normalized)
-          template: confusion_normalized
-          x_label: Actual label
-          y_label: Predicted label
-
+      - data/report.json
+    plots:
+      - plots/eval_loss.png
+      - plots/eval_accuracy.png
+      - plots/data.png

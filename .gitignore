@@ -1,13 +1,7 @@
 __pycache__/
 data
-metrics.json
-plots.json
+plots
 .venv
 .env
 .cache
 .devcontainer/devcontainer.env
-dvc_plots
-/accuracy.json
-/loss.json
-.vimspector.json
-/labels.json

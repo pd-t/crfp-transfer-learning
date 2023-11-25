@@ -1,5 +1,5 @@
 FROM nvidia/cuda:11.8.0-base-ubuntu22.04 as base
-RUN apt update && apt install -y --no-install-recommends git ssh python3 python3-pip
+RUN apt update && apt install -y --no-install-recommends git ssh python3 python3-pip screen
 RUN ln -s /usr/bin/python3 /usr/bin/python
 ENV PATH="$PATH:/home/user/.local/bin"
 

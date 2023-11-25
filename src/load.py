@@ -47,7 +47,8 @@ def load(
 
     print('load: create dataset')
     dataset = load_dataset("imagefolder", data_dir='data/tmp.dir/images', split="train")
-    dataset = dataset.shuffle(kwargs["seed"]).select(range(kwargs["select"]))
+    if kwargs["select"] != 'Complete':
+        dataset = dataset.shuffle(kwargs["seed"]).select(range(kwargs["select"]))
     return dataset
 
 if __name__ == '__main__':
