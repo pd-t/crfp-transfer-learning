@@ -20,7 +20,7 @@ trainer:
   logging_steps: 10
 
 model:
-  checkpoint: 'google/vit-base-patch16-224-in21k'
+  checkpoint: 'google/vit-large-patch16-224-in21k'
   image_size: [224, 224]
   labels_per_category: [2000, 1600, 1200, 800, 600, 400 , 200]
   logging_file : 'model.json'
