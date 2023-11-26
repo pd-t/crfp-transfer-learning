@@ -61,9 +61,9 @@ stages:
     deps:
     - path: data/search.dir
       hash: md5
-      md5: fc1f31b4829c7609c49783dc3afec1c7.dir
-      size: 2008903
-      nfiles: 213
+      md5: 513106e5fea26e1f4f9aa7fb4a11f811.dir
+      size: 5223916
+      nfiles: 451
     - path: src/shared/helpers.py
       hash: md5
       md5: 48e563e980be7bd4ff8e91b6af67e395
@@ -81,30 +81,32 @@ stages:
         data.seed: 42
         model.checkpoint: google/vit-base-patch16-224-in21k
         model.labels_per_category:
-        - 500
+        - 2000
+        - 1600
+        - 1200
+        - 800
+        - 600
         - 400
-        - 300
         - 200
-        - 100
         model.logging_file: model.json
         trainer.gradient_accumulation_steps: 4
         trainer.learning_rate: 1e-05
         trainer.loading_steps: 10
         trainer.logging_steps: 10
-        trainer.num_train_epochs: 30
+        trainer.num_train_epochs: 32
         trainer.per_device_eval_batch_size: 128
         trainer.per_device_train_batch_size: 128
         trainer.warmup_ratio: 0.1
     outs:
     - path: data/model.json
       hash: md5
-      md5: 2ea36ec7705b81891b5e11158dd0cffa
-      size: 209
+      md5: 57dd30e0d23912c7c629314d9226a95f
+      size: 239
     - path: data/train.dir
       hash: md5
-      md5: 2605efac850289ea7d465fbbccfddf1b.dir
-      size: 9885861
-      nfiles: 10
+      md5: 3c4a93dc4276263ec4950ece2ce22573.dir
+      size: 13851092
+      nfiles: 14
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
@@ -156,9 +158,9 @@ stages:
       size: 4497
     params:
       params.yaml:
-        asha.grace_period: 3
-        asha.max_t: 21
-        asha.n_trials: 30
+        asha.grace_period: 4
+        asha.max_t: 32
+        asha.n_trials: 64
         asha.reduction_factor: 2
         asha.trial_cpus: 1
         asha.trial_gpus: 0.5
@@ -168,7 +170,7 @@ stages:
         - 32
         - 64
         - 128
-        hyperparameters.labels_per_category: 256
+        hyperparameters.labels_per_category: 512
         hyperparameters.learning_rates:
         - 1e-06
         - 0.0001
@@ -177,24 +179,24 @@ stages:
         trainer.learning_rate: 1e-05
         trainer.loading_steps: 10
         trainer.logging_steps: 10
-        trainer.num_train_epochs: 30
+        trainer.num_train_epochs: 32
         trainer.per_device_eval_batch_size: 128
         trainer.per_device_train_batch_size: 128
         trainer.warmup_ratio: 0.1
     outs:
     - path: data/search.dir
       hash: md5
-      md5: fc1f31b4829c7609c49783dc3afec1c7.dir
-      size: 2008903
-      nfiles: 213
+      md5: 513106e5fea26e1f4f9aa7fb4a11f811.dir
+      size: 5223916
+      nfiles: 451
   eval:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
     - path: data/train.dir
       hash: md5
-      md5: 2605efac850289ea7d465fbbccfddf1b.dir
-      size: 9885861
-      nfiles: 10
+      md5: 3c4a93dc4276263ec4950ece2ce22573.dir
+      size: 13851092
+      nfiles: 14
     - path: src/eval.py
       hash: md5
       md5: faf34c8450bd9e01b227bb8b54c8aa1d
@@ -211,32 +213,34 @@ stages:
       params.yaml:
         model.checkpoint: google/vit-base-patch16-224-in21k
         model.labels_per_category:
-        - 500
+        - 2000
+        - 1600
+        - 1200
+        - 800
+        - 600
         - 400
-        - 300
         - 200
-        - 100
         model.logging_file: model.json
         report.logging_file: report.json
     outs:
     - path: data/eval.dir
       hash: md5
-      md5: fbe9beba82d498db1d2dc7f62aa054e7.dir
-      size: 380149
-      nfiles: 20
+      md5: 77d7fb73d4e81439d30b70f10db4a627.dir
+      size: 519741
+      nfiles: 28
     - path: data/report.json
       hash: md5
-      md5: d7add085fb4fb3cc9b65c2466a5cc781
-      size: 200
+      md5: 17dfaf8fccb4c85fa0037bcbb93808c2
+      size: 273
     - path: plots/data.png
       hash: md5
       md5: 2dd08937ca7bacf1372d10cb38999cc9
       size: 69643
     - path: plots/eval_accuracy.png
       hash: md5
-      md5: 34ef8ea35cd670afa8991a91b900bc15
-      size: 38946
+      md5: e7ff4cc2643c70add46aab951dfd68c0
+      size: 48724
     - path: plots/eval_loss.png
       hash: md5
-      md5: 42df3ec5c67323efd2426d7529c9b4a1
-      size: 49767
+      md5: 2a15bb2b3f68fd034d681f5cbf1a122a
+      size: 50775
