@@ -28,7 +28,7 @@ model:
 hyperparameters:
   labels_per_category: 512
   learning_rates: [1e-6, 1e-4]
-  batch_sizes: [16, 32, 64, 128]
+  batch_sizes: [16, 32, 64]
 
 asha:
   max_t: 32
