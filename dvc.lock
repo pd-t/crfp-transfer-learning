@@ -160,21 +160,20 @@ stages:
       params.yaml:
         asha.grace_period: 4
         asha.max_t: 32
-        asha.n_trials: 64
+        asha.n_trials: 32
         asha.reduction_factor: 2
         asha.trial_cpus: 1
-        asha.trial_gpus: 0.5
+        asha.trial_gpus: 1
         data.seed: 42
         hyperparameters.batch_sizes:
         - 16
         - 32
         - 64
-        - 128
         hyperparameters.labels_per_category: 512
         hyperparameters.learning_rates:
         - 1e-06
         - 0.0001
-        model.checkpoint: google/vit-base-patch16-224-in21k
+        model.checkpoint: google/vit-large-patch16-224-in21k
         trainer.gradient_accumulation_steps: 4
         trainer.learning_rate: 1e-05
         trainer.loading_steps: 10
@@ -186,9 +185,9 @@ stages:
     outs:
     - path: data/search.dir
       hash: md5
-      md5: 513106e5fea26e1f4f9aa7fb4a11f811.dir
-      size: 5223916
-      nfiles: 451
+      md5: 4d6b57a54d9376445478c85fe99a2b96.dir
+      size: 2513884
+      nfiles: 227
   eval:
     cmd: PYTHONPATH="." python src/eval.py
     deps:
