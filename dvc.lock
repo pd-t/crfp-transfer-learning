@@ -61,9 +61,9 @@ stages:
     deps:
     - path: data/search.dir
       hash: md5
-      md5: 513106e5fea26e1f4f9aa7fb4a11f811.dir
-      size: 5223916
-      nfiles: 451
+      md5: 4d6b57a54d9376445478c85fe99a2b96.dir
+      size: 2513884
+      nfiles: 227
     - path: src/shared/helpers.py
       hash: md5
       md5: 48e563e980be7bd4ff8e91b6af67e395
@@ -74,12 +74,12 @@ stages:
       size: 4497
     - path: src/train.py
       hash: md5
-      md5: 627d566359b0f38adce59399e1ee16f2
-      size: 3953
+      md5: 302e83ee7ee52511c5fa711d96734e97
+      size: 3997
     params:
       params.yaml:
         data.seed: 42
-        model.checkpoint: google/vit-base-patch16-224-in21k
+        model.checkpoint: google/vit-large-patch16-224-in21k
         model.labels_per_category:
         - 2000
         - 1600
@@ -100,12 +100,12 @@ stages:
     outs:
     - path: data/model.json
       hash: md5
-      md5: 57dd30e0d23912c7c629314d9226a95f
-      size: 239
+      md5: 5c64e420e8a89c8fd9d4938c6fc8f738
+      size: 240
     - path: data/train.dir
       hash: md5
-      md5: 3c4a93dc4276263ec4950ece2ce22573.dir
-      size: 13851092
+      md5: 2eb1ca67dfeb39dad2230a17011db3d9.dir
+      size: 13885192
       nfiles: 14
   evaluate:
     cmd: PYTHONPATH="." python src/eval.py
@@ -193,8 +193,8 @@ stages:
     deps:
     - path: data/train.dir
       hash: md5
-      md5: 3c4a93dc4276263ec4950ece2ce22573.dir
-      size: 13851092
+      md5: 2eb1ca67dfeb39dad2230a17011db3d9.dir
+      size: 13885192
       nfiles: 14
     - path: src/eval.py
       hash: md5
@@ -210,7 +210,7 @@ stages:
       size: 4497
     params:
       params.yaml:
-        model.checkpoint: google/vit-base-patch16-224-in21k
+        model.checkpoint: google/vit-large-patch16-224-in21k
         model.labels_per_category:
         - 2000
         - 1600
@@ -224,22 +224,22 @@ stages:
     outs:
     - path: data/eval.dir
       hash: md5
-      md5: 77d7fb73d4e81439d30b70f10db4a627.dir
-      size: 519741
+      md5: 3aeb29bb3af0e0a9bc6e81c6a3fcb325.dir
+      size: 575646
       nfiles: 28
     - path: data/report.json
       hash: md5
-      md5: 17dfaf8fccb4c85fa0037bcbb93808c2
-      size: 273
+      md5: f0b8c0fc3eeb5259e7097e60c03d97e7
+      size: 275
     - path: plots/data.png
       hash: md5
       md5: 2dd08937ca7bacf1372d10cb38999cc9
       size: 69643
     - path: plots/eval_accuracy.png
       hash: md5
-      md5: e7ff4cc2643c70add46aab951dfd68c0
-      size: 48724
+      md5: 999add98d0355816d628337b339369b2
+      size: 63944
     - path: plots/eval_loss.png
       hash: md5
-      md5: 2a15bb2b3f68fd034d681f5cbf1a122a
-      size: 50775
+      md5: 023a7e349098a777d0f7abb70d02b40d
+      size: 64564
