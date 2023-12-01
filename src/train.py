@@ -63,8 +63,8 @@ def save_predictions(dataset, model_dir, predicted_test_dataset):
 
 
 def train(dataset: datasets.DatasetDict, hyperparameters: dict, train_dir: str, **kwargs):
-    kwargs["learning_rate"] = hyperparameters["learning_rate"] 
-    kwargs["per_device_train_batch_size"] = hyperparameters["per_device_train_batch_size"]
+    kwargs["trainer"]["learning_rate"] = hyperparameters["learning_rate"] 
+    kwargs["trainer"]["per_device_train_batch_size"] = hyperparameters["per_device_train_batch_size"]
     
     model_maker = ModelMaker(checkpoints=kwargs["model"]["checkpoint"])
 
@@ -72,8 +72,8 @@ def train(dataset: datasets.DatasetDict, hyperparameters: dict, train_dir: str, 
 
     metrics = {}
     metrics.update({"checkpoint": kwargs["model"]["checkpoint"]})
-    metrics.update({"learning_rate": kwargs["learning_rate"]})
-    metrics.update({"batch_size": kwargs["per_device_train_batch_size"]})
+    metrics.update({"learning_rate": kwargs["trainer"]["learning_rate"]})
+    metrics.update({"batch_size": kwargs["trainer"]["per_device_train_batch_size"]})
 
     model_label_per_categories = []
     for labels_per_category in kwargs["model"]["labels_per_category"]:
