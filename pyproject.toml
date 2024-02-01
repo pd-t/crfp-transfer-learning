@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "supa-recast"
+name = "src"
 version = "0.0.1"
 description = ""
-authors = ["Thomas Fraunholz <tf@wogra.com>"]
+authors = ["Anonymous <anonymous@anonymous.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
