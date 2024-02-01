@@ -1,8 +1,8 @@
 data:
   remote:
-    s3_endpoint_url: 'https://storage.s3.mlops.wogra.com'
-    s3_bucket: 'data'
-    s3_path: 'dlr/Tapelegedaten2023.zip'
+    s3_endpoint_url: 'https://storage.googleapis.com'
+    s3_bucket: 'crfp-data'
+    s3_path: 'Tapelegedaten2023.zip'
   select: 'Complete'
   test-size: 0.3
   train-size: 0.9
@@ -20,7 +20,7 @@ trainer:
   logging_steps: 10
 
 model:
-  checkpoint: 'google/vit-large-patch16-224-in21k'
+  checkpoint: 'facebook/dinov2-small' 
   image_size: [224, 224]
   labels_per_category: [2000, 1600, 1200, 800, 600, 400 , 200]
   logging_file : 'model.json'
@@ -28,7 +28,7 @@ model:
 hyperparameters:
   labels_per_category: 512
   learning_rates: [1e-6, 1e-4]
-  batch_sizes: [16, 32, 64]
+  batch_sizes: [16, 32, 64, 128]
 
 asha:
   max_t: 32
@@ -36,7 +36,7 @@ asha:
   reduction_factor: 2
   trial_cpus: 1
   trial_gpus: 1
-  n_trials: 32
+  n_trials: 64
 
 report:
   logging_file: 'report.json'

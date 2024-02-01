@@ -7,7 +7,9 @@
 		"context": ".."
 	},
 	"remoteUser": "user",
-	"runArgs": ["--env-file",".devcontainer/devcontainer.env","--gpus","all", "--shm-size=10.24gb"],
+	// Uncomment for GPU support
+	//"runArgs": ["--env-file",".devcontainer/devcontainer.env","--gpus","all", "--shm-size=10.24gb"],
+	"runArgs": ["--env-file",".devcontainer/devcontainer.env"],
 	"postCreateCommand": "bash scripts/install-dev-tools.sh",
 	"mounts": [
 		// Re-use local SSH keys (useful if you use SSH keys for Git repo access or other SSH work)

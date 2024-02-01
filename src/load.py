@@ -10,9 +10,7 @@ def download_data_from_s3(
            endpoint_url: str,
            bucket: str,
            path: str,
-           local_path: str,
-           credential_path: str = '.dvc/.minio_credentials'):
-    os.environ['AWS_SHARED_CREDENTIALS_FILE'] = credential_path
+           local_path: str):
 
     session = boto3.Session()
     client = session.client(

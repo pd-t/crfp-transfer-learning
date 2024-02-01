@@ -1,7 +1,0 @@
-['remote "s3remote"']
-url = s3://dvc/dlr
-endpointurl = https://storage.s3.mlops.wogra.com
-credentialpath = .minio_credentials
-
-[core]
-remote = s3remote
