@@ -2,7 +2,7 @@ data:
   remote:
     s3_endpoint_url: 'https://storage.googleapis.com'
     s3_bucket: 'crfp-data'
-    s3_path: 'Tapelegedaten2023.zip'
+    s3_path: 'crfp.zip'
   select: 'Complete'
   test-size: 0.3
   train-size: 0.9
